@@ -27,9 +27,68 @@
 
 ## Project setup
 
+### Docker ile çalıştırma (Önerilen)
+
+```bash
+# Tüm servisleri başlat (MongoDB, Redis, RabbitMQ)
+$ docker-compose up -d
+
+# Sadece veritabanı servislerini başlat
+$ docker-compose up -d mongodb redis rabbitmq
+
+# Servisleri durdur
+$ docker-compose down
+
+# Servisleri ve volume'ları temizle
+$ docker-compose down -v
+```
+
+### Manuel kurulum
+
 ```bash
 $ npm install
 ```
+
+### Environment Variables
+
+Proje çalışması için aşağıdaki environment variables'ları ayarlayın:
+
+```bash
+# Server Configuration
+NODE_ENV=development
+PORT=3000
+
+# MongoDB Configuration
+MONGODB_URI=mongodb://admin:password123@localhost:27017/algomath_kids?authSource=admin
+
+# Redis Configuration
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=redis123
+
+# RabbitMQ Configuration
+RABBITMQ_URL=amqp://admin:password123@localhost:5672
+
+# JWT Configuration
+JWT_SECRET=your-super-secret-jwt-key-here
+JWT_EXPIRES_IN=7d
+```
+
+### Servis Erişim Bilgileri
+
+- **MongoDB**: `localhost:27017`
+  - Username: `admin`
+  - Password: `password123`
+  - Database: `algomath_kids`
+
+- **Redis**: `localhost:6379`
+  - Password: `redis123`
+
+- **RabbitMQ Management UI**: `http://localhost:15672`
+  - Username: `admin`
+  - Password: `password123`
+
+- **API Documentation**: `http://localhost:3000/api/docs`
 
 ## Compile and run the project
 
