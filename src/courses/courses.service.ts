@@ -6,6 +6,7 @@ import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course, CourseDocument } from './schemas/course.schema';
 import { User, UserDocument } from '../users/schemas/user.schema';
+import { ManageCourseMemberBatchDto } from './dto/manage-course-member-batch.dto';
 
 @Injectable()
 export class CoursesService {
@@ -220,6 +221,72 @@ export class CoursesService {
       .updateOne({ _id: userId }, { $pull: { courses: course._id } })
       .exec();
     return course.toObject();
+  }
+
+  async bulkTeachers(courseId: string, dto: ManageCourseMemberBatchDto) {
+    const course = await this.courseModel.findById(courseId).exec();
+    if (!course) throw new NotFoundException('Course not found');
+
+    const addIds = dto.add.map((id) => new Types.ObjectId(id));
+    const removeIds = dto.remove.map((id) => new Types.ObjectId(id));
+
+    await this.courseModel
+      .updateOne(
+        { _id: courseId },
+        {
+          $addToSet: { teachers: { $each: addIds } },
+          $pull: { teachers: { $in: removeIds } },
+        },
+      )
+      .exec();
+
+    await this.userModel
+      .updateMany(
+        { _id: { $in: addIds } },
+        { $addToSet: { courses: course._id } },
+      )
+      .exec();
+    await this.userModel
+      .updateMany(
+        { _id: { $in: removeIds } },
+        { $pull: { courses: course._id } },
+      )
+      .exec();
+
+    return (await this.courseModel.findById(courseId).lean().exec())!;
+  }
+
+  async bulkStudents(courseId: string, dto: ManageCourseMemberBatchDto) {
+    const course = await this.courseModel.findById(courseId).exec();
+    if (!course) throw new NotFoundException('Course not found');
+
+    const addIds = dto.add.map((id) => new Types.ObjectId(id));
+    const removeIds = dto.remove.map((id) => new Types.ObjectId(id));
+
+    await this.courseModel
+      .updateOne(
+        { _id: courseId },
+        {
+          $addToSet: { students: { $each: addIds } },
+          $pull: { students: { $in: removeIds } },
+        },
+      )
+      .exec();
+
+    await this.userModel
+      .updateMany(
+        { _id: { $in: addIds } },
+        { $addToSet: { courses: course._id } },
+      )
+      .exec();
+    await this.userModel
+      .updateMany(
+        { _id: { $in: removeIds } },
+        { $pull: { courses: course._id } },
+      )
+      .exec();
+
+    return (await this.courseModel.findById(courseId).lean().exec())!;
   }
 
   private mapToObjectIds(values?: string[]) {

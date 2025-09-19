@@ -52,9 +52,9 @@ export class QuizzesService {
 
     // Publish event
     const payload = JSON.stringify({
-      quizId: quiz.id,
-      courseId: course.id,
-      title: quiz.title,
+      quizId: String(quiz._id),
+      courseId: String(course._id),
+      title: String(quiz.title ?? ''),
     });
     this.messagingService.publish(
       'events',

@@ -62,9 +62,9 @@ export class DocumentsService {
 
     // Publish event
     const payload = JSON.stringify({
-      documentId: document.id,
-      courseId: course.id,
-      title: document.title,
+      documentId: String(document._id),
+      courseId: String(course._id),
+      title: String(document.title ?? ''),
     });
     this.messagingService.publish(
       'events',

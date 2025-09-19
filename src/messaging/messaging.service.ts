@@ -1,28 +1,22 @@
 import { Injectable, Logger } from '@nestjs/common';
-import {
-  connect,
-  Connection,
-  Channel,
-  Options,
-  MessageCallback,
-} from 'amqplib';
+import * as amqplib from 'amqplib';
 
 @Injectable()
 export class MessagingService {
   private readonly logger = new Logger(MessagingService.name);
-  private connection: Connection | null = null;
-  private channel: Channel | null = null;
+  private connection: amqplib.Connection | null = null;
+  private channel: amqplib.Channel | null = null;
 
   async connect(url: string) {
     if (this.connection) return;
-    this.connection = await connect(url);
+    this.connection = await amqplib.connect(url);
     this.channel = await this.connection.createChannel();
   }
 
   async assertExchange(
     name: string,
-    type: string = 'topic',
-    options?: Options.AssertExchange,
+    type: amqplib.ExchangeType = 'topic',
+    options?: amqplib.Options.AssertExchange,
   ) {
     if (!this.channel) throw new Error('Channel not initialized');
     await this.channel.assertExchange(name, type, options);
@@ -32,13 +26,13 @@ export class MessagingService {
     exchange: string,
     routingKey: string,
     content: Buffer,
-    options?: Options.Publish,
+    options?: amqplib.Options.Publish,
   ) {
     if (!this.channel) throw new Error('Channel not initialized');
     this.channel.publish(exchange, routingKey, content, options);
   }
 
-  async assertQueue(name: string, options?: Options.AssertQueue) {
+  async assertQueue(name: string, options?: amqplib.Options.AssertQueue) {
     if (!this.channel) throw new Error('Channel not initialized');
     await this.channel.assertQueue(name, options);
   }
@@ -50,8 +44,8 @@ export class MessagingService {
 
   async consume(
     queue: string,
-    onMessage: MessageCallback,
-    options?: Options.Consume,
+    onMessage: (msg: amqplib.ConsumeMessage | null) => void,
+    options?: amqplib.Options.Consume,
   ) {
     if (!this.channel) throw new Error('Channel not initialized');
     await this.channel.consume(queue, onMessage, options);

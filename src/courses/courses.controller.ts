@@ -27,6 +27,7 @@ import { Role } from '../common/enums/roles.enum';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { ManageCourseMemberDto } from './dto/manage-course-member.dto';
+import { ManageCourseMemberBatchDto } from './dto/manage-course-member-batch.dto';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { CoursesService } from './courses.service';
@@ -35,6 +36,7 @@ import { DocumentsService } from '../documents/documents.service';
 import { AssignmentsService } from '../assignments/assignments.service';
 import { ChatService } from '../chat/chat.service';
 import { CreateQuizDto } from '../quizzes/dto/create-quiz.dto';
+import { CreateCourseQuizDto } from './dto/create-course-quiz.dto';
 import { CreateDocumentDto } from '../documents/dto/create-document.dto';
 import { CreateAssignmentDto } from '../assignments/dto/create-assignment.dto';
 import { CreateChatMessageDto } from '../chat/dto/create-chat-message.dto';
@@ -112,6 +114,24 @@ export class CoursesController {
     return this.coursesService.addStudent(id, manageCourseMemberDto);
   }
 
+  @Patch(':id/teachers')
+  @Roles(Role.Admin)
+  bulkTeachers(
+    @Param('id') id: string,
+    @Body() dto: ManageCourseMemberBatchDto,
+  ) {
+    return this.coursesService.bulkTeachers(id, dto);
+  }
+
+  @Patch(':id/students')
+  @Roles(Role.Admin, Role.Teacher)
+  bulkStudents(
+    @Param('id') id: string,
+    @Body() dto: ManageCourseMemberBatchDto,
+  ) {
+    return this.coursesService.bulkStudents(id, dto);
+  }
+
   @Delete(':id/students/:userId')
   @Roles(Role.Admin, Role.Teacher)
   removeStudent(@Param('id') id: string, @Param('userId') userId: string) {
@@ -122,11 +142,13 @@ export class CoursesController {
   @Post(':id/quizzes')
   @Roles(Role.Teacher)
   @ApiOperation({ summary: 'Kursa quiz oluştur' })
-  createQuiz(
-    @Param('id') courseId: string,
-    @Body() dto: Omit<CreateQuizDto, 'courseId'> & Partial<CreateQuizDto>,
-  ) {
-    const payload: CreateQuizDto = { ...dto, courseId } as CreateQuizDto;
+  createQuiz(@Param('id') courseId: string, @Body() dto: CreateCourseQuizDto) {
+    const payload: CreateQuizDto = {
+      courseId,
+      title: dto.title,
+      description: dto.description,
+      questions: dto.questions,
+    };
     return this.quizzesService.create(payload);
   }
 

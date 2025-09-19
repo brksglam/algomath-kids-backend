@@ -86,7 +86,7 @@ export class AuthService {
     const obj = user.toObject() as unknown as {
       password?: unknown;
     } & Record<string, unknown>;
-    const { password: _password, ...safe } = obj;
-    return safe;
+    delete obj.password;
+    return obj;
   }
 }

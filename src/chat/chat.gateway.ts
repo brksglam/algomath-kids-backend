@@ -16,10 +16,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(private readonly chatService: ChatService) {}
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handleConnection(_client: Socket) {
     // no-op: auth could be verified here
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handleDisconnect(_client: Socket) {
     // no-op
   }

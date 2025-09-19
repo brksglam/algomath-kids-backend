@@ -35,10 +35,10 @@ export class RedisService implements OnModuleDestroy {
     this.client
       .connect()
       .then(() => this.logger.log('Connected to Redis instance'))
-      .catch((err) => {
+      .catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : String(err);
         this.logger.warn(
-          'Could not connect to Redis. Features disabled. Reason: ' +
-            err.message,
+          'Could not connect to Redis. Features disabled. Reason: ' + msg,
         );
         try {
           this.client?.disconnect();
