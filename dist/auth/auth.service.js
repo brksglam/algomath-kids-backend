@@ -46,11 +46,11 @@ exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const bcrypt = __importStar(require("bcrypt"));
+const roles_enum_1 = require("../common/enums/roles.enum");
 const users_service_1 = require("../users/users.service");
 let AuthService = class AuthService {
     usersService;
     jwtService;
-    saltRounds = 10;
     constructor(usersService, jwtService) {
         this.usersService = usersService;
         this.jwtService = jwtService;
@@ -60,21 +60,27 @@ let AuthService = class AuthService {
         if (existingUser) {
             throw new common_1.ConflictException('Email already registered');
         }
-        const hashedPassword = await bcrypt.hash(registerDto.password, this.saltRounds);
-        const createUserDto = {
-            ...registerDto,
-            password: hashedPassword,
-        };
-        const user = await this.usersService.create(createUserDto);
-        const { password, ...safeUser } = user.toObject();
-        return safeUser;
+        const role = registerDto.role ?? roles_enum_1.Role.Student;
+        if (role !== roles_enum_1.Role.Student) {
+            throw new common_1.ForbiddenException('Only students can self-register');
+        }
+        const user = await this.usersService.create({ ...registerDto, role });
+        return this.sanitizeUser(user);
+    }
+    async adminCreateUser(adminCreateUserDto) {
+        const existingUser = await this.usersService.findByEmail(adminCreateUserDto.email);
+        if (existingUser) {
+            throw new common_1.ConflictException('Email already registered');
+        }
+        const user = await this.usersService.create(adminCreateUserDto);
+        return this.sanitizeUser(user);
     }
     async login(loginDto) {
         const user = await this.validateUser(loginDto.email, loginDto.password);
         const payload = {
             sub: user.id,
             email: user.email,
-            roles: user.roles,
+            role: user.role,
         };
         const accessToken = await this.jwtService.signAsync(payload);
         return { accessToken };
@@ -89,6 +95,10 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException('Invalid credentials');
         }
         return user;
+    }
+    sanitizeUser(user) {
+        const { password, ...safeUser } = user.toObject();
+        return safeUser;
     }
 };
 exports.AuthService = AuthService;

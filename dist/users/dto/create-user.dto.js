@@ -16,7 +16,8 @@ class CreateUserDto {
     email;
     password;
     name;
-    roles;
+    role;
+    courses;
 }
 exports.CreateUserDto = CreateUserDto;
 __decorate([
@@ -34,9 +35,14 @@ __decorate([
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "name", void 0);
 __decorate([
+    (0, class_validator_1.IsEnum)(roles_enum_1.Role),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "role", void 0);
+__decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsArray)(),
-    (0, class_validator_1.IsEnum)(roles_enum_1.Role, { each: true }),
+    (0, class_validator_1.IsMongoId)({ each: true }),
     __metadata("design:type", Array)
-], CreateUserDto.prototype, "roles", void 0);
+], CreateUserDto.prototype, "courses", void 0);
 //# sourceMappingURL=create-user.dto.js.map

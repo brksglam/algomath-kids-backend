@@ -9,20 +9,28 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CoursesModule = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
-const messaging_module_1 = require("../messaging/messaging.module");
-const storage_module_1 = require("../storage/storage.module");
 const courses_controller_1 = require("./courses.controller");
 const courses_service_1 = require("./courses.service");
 const course_schema_1 = require("./schemas/course.schema");
+const user_schema_1 = require("../users/schemas/user.schema");
+const quizzes_module_1 = require("../quizzes/quizzes.module");
+const documents_module_1 = require("../documents/documents.module");
+const assignments_module_1 = require("../assignments/assignments.module");
+const chat_module_1 = require("../chat/chat.module");
 let CoursesModule = class CoursesModule {
 };
 exports.CoursesModule = CoursesModule;
 exports.CoursesModule = CoursesModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forFeature([{ name: course_schema_1.Course.name, schema: course_schema_1.CourseSchema }]),
-            storage_module_1.StorageModule,
-            messaging_module_1.MessagingModule,
+            quizzes_module_1.QuizzesModule,
+            documents_module_1.DocumentsModule,
+            assignments_module_1.AssignmentsModule,
+            chat_module_1.ChatModule,
+            mongoose_1.MongooseModule.forFeature([
+                { name: course_schema_1.Course.name, schema: course_schema_1.CourseSchema },
+                { name: user_schema_1.User.name, schema: user_schema_1.UserSchema },
+            ]),
         ],
         controllers: [courses_controller_1.CoursesController],
         providers: [courses_service_1.CoursesService],

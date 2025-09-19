@@ -1,93 +1,33 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Schema as MongooseSchema, Types } from 'mongoose';
-import { User } from '../../users/schemas/user.schema';
 
 export type CourseDocument = HydratedDocument<Course>;
 
-@Schema({ _id: false })
-export class Quiz {
-  @Prop({ required: true })
-  title: string;
-
-  @Prop()
-  description?: string;
-
-  @Prop({ default: Date.now })
-  createdAt: Date;
-}
-
-export const QuizSchema = SchemaFactory.createForClass(Quiz);
-
-@Schema({ _id: false })
-export class CourseDocumentEntry {
-  @Prop({ required: true })
-  name: string;
-
-  @Prop({ required: true })
-  url: string;
-
-  @Prop()
-  description?: string;
-
-  @Prop({ default: Date.now })
-  uploadedAt: Date;
-}
-
-export const CourseDocumentEntrySchema = SchemaFactory.createForClass(CourseDocumentEntry);
-
-@Schema({ _id: false })
-export class Assignment {
-  @Prop({ required: true })
-  title: string;
-
-  @Prop()
-  description?: string;
-
-  @Prop()
-  dueDate?: Date;
-
-  @Prop({ default: Date.now })
-  assignedAt: Date;
-}
-
-export const AssignmentSchema = SchemaFactory.createForClass(Assignment);
-
-@Schema({ _id: false })
-export class ChatMessage {
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: User.name, required: true })
-  sender: Types.ObjectId;
-
-  @Prop({ required: true })
-  message: string;
-
-  @Prop({ default: Date.now })
-  sentAt: Date;
-}
-
-export const ChatMessageSchema = SchemaFactory.createForClass(ChatMessage);
-
 @Schema({ timestamps: true })
 export class Course {
-  @Prop({ required: true })
+  @Prop({ required: true, trim: true })
   title: string;
 
-  @Prop()
+  @Prop({ trim: true })
   description?: string;
 
-  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: User.name }], default: [] })
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }], default: [] })
   teachers: Types.ObjectId[];
 
-  @Prop({ type: [QuizSchema], default: [] })
-  quizzes: Quiz[];
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }], default: [] })
+  students: Types.ObjectId[];
 
-  @Prop({ type: [CourseDocumentEntrySchema], default: [] })
-  documents: CourseDocumentEntry[];
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Document' }], default: [] })
+  documents: Types.ObjectId[];
 
-  @Prop({ type: [AssignmentSchema], default: [] })
-  assignments: Assignment[];
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Assignment' }], default: [] })
+  assignments: Types.ObjectId[];
 
-  @Prop({ type: [ChatMessageSchema], default: [] })
-  chatMessages: ChatMessage[];
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Quiz' }], default: [] })
+  quizzes: Types.ObjectId[];
+
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'ChatMessage' }], default: [] })
+  chats: Types.ObjectId[];
 }
 
 export const CourseSchema = SchemaFactory.createForClass(Course);

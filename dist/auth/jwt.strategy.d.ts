@@ -9,7 +9,7 @@ export declare class JwtStrategy extends JwtStrategy_base {
     validate(payload: JwtPayload): {
         userId: string;
         email: string;
-        roles: import("../common/enums/roles.enum").Role[];
+        role: import("../common/enums/roles.enum").Role;
     };
 }
 export {};

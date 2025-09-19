@@ -16,7 +16,7 @@ class RegisterDto {
     email;
     password;
     name;
-    roles;
+    role;
 }
 exports.RegisterDto = RegisterDto;
 __decorate([
@@ -35,8 +35,7 @@ __decorate([
 ], RegisterDto.prototype, "name", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsArray)(),
-    (0, class_validator_1.IsEnum)(roles_enum_1.Role, { each: true }),
-    __metadata("design:type", Array)
-], RegisterDto.prototype, "roles", void 0);
+    (0, class_validator_1.IsEnum)(roles_enum_1.Role),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "role", void 0);
 //# sourceMappingURL=register.dto.js.map

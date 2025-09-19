@@ -16,114 +16,160 @@ exports.CoursesService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
-const messaging_service_1 = require("../messaging/messaging.service");
-const storage_service_1 = require("../storage/storage.service");
 const course_schema_1 = require("./schemas/course.schema");
+const user_schema_1 = require("../users/schemas/user.schema");
 let CoursesService = class CoursesService {
     courseModel;
-    storageService;
-    messagingService;
-    constructor(courseModel, storageService, messagingService) {
+    userModel;
+    constructor(courseModel, userModel) {
         this.courseModel = courseModel;
-        this.storageService = storageService;
-        this.messagingService = messagingService;
+        this.userModel = userModel;
     }
-    async getCourseOrThrow(courseId) {
-        const course = await this.courseModel.findById(courseId);
+    async create(createCourseDto) {
+        const course = new this.courseModel({
+            ...createCourseDto,
+            teachers: this.mapToObjectIds(createCourseDto.teachers),
+            students: this.mapToObjectIds(createCourseDto.students),
+        });
+        const savedCourse = await course.save();
+        await this.addCourseReference([...savedCourse.teachers, ...savedCourse.students], savedCourse._id);
+        return savedCourse.toObject();
+    }
+    async findAll() {
+        return this.courseModel.find().lean().exec();
+    }
+    async findOne(id) {
+        const course = await this.courseModel.findById(id).lean().exec();
         if (!course) {
             throw new common_1.NotFoundException('Course not found');
         }
         return course;
     }
-    async addTeacher(courseId, manageTeacherDto) {
-        const course = await this.getCourseOrThrow(courseId);
-        const teacherObjectId = new mongoose_2.Types.ObjectId(manageTeacherDto.teacherId);
-        const alreadyAssigned = course.teachers.some((teacher) => teacher.equals(teacherObjectId));
-        if (!alreadyAssigned) {
-            course.teachers.push(teacherObjectId);
-            await course.save();
+    async findOneWithRelations(id) {
+        const course = await this.courseModel
+            .findById(id)
+            .populate('teachers', '-password')
+            .populate('students', '-password')
+            .populate('documents')
+            .populate('assignments')
+            .populate('quizzes')
+            .populate('chats')
+            .lean()
+            .exec();
+        if (!course) {
+            throw new common_1.NotFoundException('Course not found');
         }
         return course;
     }
-    async removeTeacher(courseId, teacherId) {
-        const course = await this.getCourseOrThrow(courseId);
-        course.teachers = course.teachers.filter((teacher) => teacher.toString() !== teacherId);
-        await course.save();
-        return course;
+    async update(id, updateCourseDto) {
+        const update = { ...updateCourseDto };
+        if (updateCourseDto.teachers) {
+            update.teachers = this.mapToObjectIds(updateCourseDto.teachers);
+        }
+        if (updateCourseDto.students) {
+            update.students = this.mapToObjectIds(updateCourseDto.students);
+        }
+        if (updateCourseDto.documents) {
+            update.documents = this.mapToObjectIds(updateCourseDto.documents);
+        }
+        if (updateCourseDto.assignments) {
+            update.assignments = this.mapToObjectIds(updateCourseDto.assignments);
+        }
+        if (updateCourseDto.quizzes) {
+            update.quizzes = this.mapToObjectIds(updateCourseDto.quizzes);
+        }
+        if (updateCourseDto.chats) {
+            update.chats = this.mapToObjectIds(updateCourseDto.chats);
+        }
+        const course = await this.courseModel
+            .findByIdAndUpdate(id, update, { new: true })
+            .exec();
+        if (!course) {
+            throw new common_1.NotFoundException('Course not found');
+        }
+        await this.refreshCourseReferences(course);
+        return course.toObject();
     }
-    async createQuiz(courseId, createQuizDto) {
-        const course = await this.getCourseOrThrow(courseId);
-        const quiz = {
-            title: createQuizDto.title,
-            description: createQuizDto.description,
-            createdAt: new Date(),
-        };
-        course.quizzes.push(quiz);
-        await course.save();
-        await this.messagingService.publish('quizCreated', {
-            courseId,
-            quiz: {
-                title: quiz.title,
-                description: quiz.description,
-            },
-        });
-        return quiz;
+    async remove(id) {
+        const course = await this.courseModel.findByIdAndDelete(id).exec();
+        if (!course) {
+            throw new common_1.NotFoundException('Course not found');
+        }
+        await this.removeCourseReference(course._id);
     }
-    async getQuizzes(courseId) {
-        const course = await this.getCourseOrThrow(courseId);
-        return course.quizzes;
+    async addTeacher(courseId, manageCourseMemberDto) {
+        await this.ensureUserExists(manageCourseMemberDto.userId);
+        const course = await this.courseModel
+            .findByIdAndUpdate(courseId, { $addToSet: { teachers: new mongoose_2.Types.ObjectId(manageCourseMemberDto.userId) } }, { new: true })
+            .exec();
+        if (!course) {
+            throw new common_1.NotFoundException('Course not found');
+        }
+        await this.addCourseReference([new mongoose_2.Types.ObjectId(manageCourseMemberDto.userId)], course._id);
+        return course.toObject();
     }
-    async addDocument(courseId, file, uploadDocumentDto) {
-        const course = await this.getCourseOrThrow(courseId);
-        const uploadPath = 'courses/' + courseId + '/documents';
-        const uploadedUrl = await this.storageService.upload(file, uploadPath);
-        const documentEntry = {
-            name: uploadDocumentDto.name ?? file.originalname,
-            description: uploadDocumentDto.description,
-            url: uploadedUrl,
-            uploadedAt: new Date(),
-        };
-        course.documents.push(documentEntry);
-        await course.save();
-        await this.messagingService.publish('documentUploaded', {
-            courseId,
-            document: {
-                name: documentEntry.name,
-                url: documentEntry.url,
-            },
-        });
-        return documentEntry;
+    async removeTeacher(courseId, userId) {
+        const course = await this.courseModel
+            .findByIdAndUpdate(courseId, { $pull: { teachers: new mongoose_2.Types.ObjectId(userId) } }, { new: true })
+            .exec();
+        if (!course) {
+            throw new common_1.NotFoundException('Course not found');
+        }
+        await this.userModel.updateOne({ _id: userId }, { $pull: { courses: course._id } }).exec();
+        return course.toObject();
     }
-    async addAssignment(courseId, createAssignmentDto) {
-        const course = await this.getCourseOrThrow(courseId);
-        const assignment = {
-            title: createAssignmentDto.title,
-            description: createAssignmentDto.description,
-            dueDate: createAssignmentDto.dueDate ? new Date(createAssignmentDto.dueDate) : undefined,
-            assignedAt: new Date(),
-        };
-        course.assignments.push(assignment);
-        await course.save();
-        return assignment;
+    async addStudent(courseId, manageCourseMemberDto) {
+        await this.ensureUserExists(manageCourseMemberDto.userId);
+        const course = await this.courseModel
+            .findByIdAndUpdate(courseId, { $addToSet: { students: new mongoose_2.Types.ObjectId(manageCourseMemberDto.userId) } }, { new: true })
+            .exec();
+        if (!course) {
+            throw new common_1.NotFoundException('Course not found');
+        }
+        await this.addCourseReference([new mongoose_2.Types.ObjectId(manageCourseMemberDto.userId)], course._id);
+        return course.toObject();
     }
-    async addChatMessage(courseId, createChatMessageDto) {
-        const course = await this.getCourseOrThrow(courseId);
-        const message = {
-            sender: new mongoose_2.Types.ObjectId(createChatMessageDto.senderId),
-            message: createChatMessageDto.message,
-            sentAt: new Date(),
-        };
-        course.chatMessages.push(message);
-        await course.save();
-        return message;
+    async removeStudent(courseId, userId) {
+        const course = await this.courseModel
+            .findByIdAndUpdate(courseId, { $pull: { students: new mongoose_2.Types.ObjectId(userId) } }, { new: true })
+            .exec();
+        if (!course) {
+            throw new common_1.NotFoundException('Course not found');
+        }
+        await this.userModel.updateOne({ _id: userId }, { $pull: { courses: course._id } }).exec();
+        return course.toObject();
+    }
+    mapToObjectIds(values) {
+        return values?.map((value) => new mongoose_2.Types.ObjectId(value)) ?? [];
+    }
+    async ensureUserExists(userId) {
+        const user = await this.userModel.findById(userId).exec();
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+    }
+    async addCourseReference(userIds, courseId) {
+        if (userIds.length === 0) {
+            return;
+        }
+        await this.userModel
+            .updateMany({ _id: { $in: userIds } }, { $addToSet: { courses: courseId } })
+            .exec();
+    }
+    async refreshCourseReferences(course) {
+        await this.removeCourseReference(course._id);
+        await this.addCourseReference([...course.teachers, ...course.students], course._id);
+    }
+    async removeCourseReference(courseId) {
+        await this.userModel.updateMany({ courses: courseId }, { $pull: { courses: courseId } }).exec();
     }
 };
 exports.CoursesService = CoursesService;
 exports.CoursesService = CoursesService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(course_schema_1.Course.name)),
+    __param(1, (0, mongoose_1.InjectModel)(user_schema_1.User.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
-        storage_service_1.StorageService,
-        messaging_service_1.MessagingService])
+        mongoose_2.Model])
 ], CoursesService);
 //# sourceMappingURL=courses.service.js.map

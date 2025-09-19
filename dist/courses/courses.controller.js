@@ -23,106 +23,205 @@ const roles_decorator_1 = require("../common/decorators/roles.decorator");
 const roles_enum_1 = require("../common/enums/roles.enum");
 const jwt_auth_guard_1 = require("../common/guards/jwt-auth.guard");
 const roles_guard_1 = require("../common/guards/roles.guard");
-const create_assignment_dto_1 = require("./dto/create-assignment.dto");
-const create_chat_message_dto_1 = require("./dto/create-chat-message.dto");
-const create_quiz_dto_1 = require("./dto/create-quiz.dto");
-const manage_teacher_dto_1 = require("./dto/manage-teacher.dto");
-const upload_document_dto_1 = require("./dto/upload-document.dto");
+const manage_course_member_dto_1 = require("./dto/manage-course-member.dto");
+const create_course_dto_1 = require("./dto/create-course.dto");
+const update_course_dto_1 = require("./dto/update-course.dto");
 const courses_service_1 = require("./courses.service");
+const quizzes_service_1 = require("../quizzes/quizzes.service");
+const documents_service_1 = require("../documents/documents.service");
+const assignments_service_1 = require("../assignments/assignments.service");
+const chat_service_1 = require("../chat/chat.service");
 let CoursesController = class CoursesController {
     coursesService;
-    constructor(coursesService) {
+    quizzesService;
+    documentsService;
+    assignmentsService;
+    chatService;
+    constructor(coursesService, quizzesService, documentsService, assignmentsService, chatService) {
         this.coursesService = coursesService;
+        this.quizzesService = quizzesService;
+        this.documentsService = documentsService;
+        this.assignmentsService = assignmentsService;
+        this.chatService = chatService;
     }
-    addTeacher(id, manageTeacherDto) {
-        return this.coursesService.addTeacher(id, manageTeacherDto);
+    create(createCourseDto) {
+        return this.coursesService.create(createCourseDto);
     }
-    removeTeacher(id, teacherId) {
-        return this.coursesService.removeTeacher(id, teacherId);
+    findAll() {
+        return this.coursesService.findAll();
     }
-    createQuiz(id, createQuizDto) {
-        return this.coursesService.createQuiz(id, createQuizDto);
+    getDetail(id) {
+        return this.coursesService.findOneWithRelations(id);
     }
-    getQuizzes(id) {
-        return this.coursesService.getQuizzes(id);
+    update(id, updateCourseDto) {
+        return this.coursesService.update(id, updateCourseDto);
     }
-    addDocument(id, file, uploadDocumentDto) {
-        return this.coursesService.addDocument(id, file, uploadDocumentDto);
+    remove(id) {
+        return this.coursesService.remove(id);
     }
-    addAssignment(id, createAssignmentDto) {
-        return this.coursesService.addAssignment(id, createAssignmentDto);
+    addTeacher(id, manageCourseMemberDto) {
+        return this.coursesService.addTeacher(id, manageCourseMemberDto);
     }
-    addChatMessage(id, createChatMessageDto) {
-        return this.coursesService.addChatMessage(id, createChatMessageDto);
+    removeTeacher(id, userId) {
+        return this.coursesService.removeTeacher(id, userId);
+    }
+    addStudent(id, manageCourseMemberDto) {
+        return this.coursesService.addStudent(id, manageCourseMemberDto);
+    }
+    removeStudent(id, userId) {
+        return this.coursesService.removeStudent(id, userId);
+    }
+    createQuiz(courseId, dto) {
+        const payload = { ...dto, courseId };
+        return this.quizzesService.create(payload);
+    }
+    listQuizzes(courseId) {
+        return this.quizzesService.findByCourse(courseId);
+    }
+    createDocument(courseId, dto, file, req) {
+        const user = req.user;
+        const payload = { ...dto, courseId };
+        return this.documentsService.create(payload, file, user.userId);
+    }
+    createAssignment(courseId, dto) {
+        const payload = { ...dto, courseId };
+        return this.assignmentsService.create(payload);
+    }
+    createChatMessage(courseId, dto, req) {
+        const user = req.user;
+        return this.chatService.createMessage(courseId, user.userId, dto.content);
     }
 };
 exports.CoursesController = CoursesController;
+__decorate([
+    (0, common_1.Post)(),
+    (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_course_dto_1.CreateCourseDto]),
+    __metadata("design:returntype", void 0)
+], CoursesController.prototype, "create", null);
+__decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], CoursesController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], CoursesController.prototype, "getDetail", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_course_dto_1.UpdateCourseDto]),
+    __metadata("design:returntype", void 0)
+], CoursesController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], CoursesController.prototype, "remove", null);
 __decorate([
     (0, common_1.Post)(':id/teachers'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, manage_teacher_dto_1.ManageTeacherDto]),
+    __metadata("design:paramtypes", [String, manage_course_member_dto_1.ManageCourseMemberDto]),
     __metadata("design:returntype", void 0)
 ], CoursesController.prototype, "addTeacher", null);
 __decorate([
-    (0, common_1.Delete)(':id/teachers/:teacherId'),
+    (0, common_1.Delete)(':id/teachers/:userId'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin),
     __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Param)('teacherId')),
+    __param(1, (0, common_1.Param)('userId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], CoursesController.prototype, "removeTeacher", null);
+__decorate([
+    (0, common_1.Post)(':id/students'),
+    (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, manage_course_member_dto_1.ManageCourseMemberDto]),
+    __metadata("design:returntype", void 0)
+], CoursesController.prototype, "addStudent", null);
+__decorate([
+    (0, common_1.Delete)(':id/students/:userId'),
+    (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", void 0)
+], CoursesController.prototype, "removeStudent", null);
 __decorate([
     (0, common_1.Post)(':id/quizzes'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Teacher),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, create_quiz_dto_1.CreateQuizDto]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], CoursesController.prototype, "createQuiz", null);
 __decorate([
     (0, common_1.Get)(':id/quizzes'),
+    (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher, roles_enum_1.Role.Student),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
-], CoursesController.prototype, "getQuizzes", null);
+], CoursesController.prototype, "listQuizzes", null);
 __decorate([
     (0, common_1.Post)(':id/documents'),
-    (0, roles_decorator_1.Roles)(roles_enum_1.Role.Teacher),
+    (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', { storage: multer_1.default.memoryStorage() })),
     __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.UploadedFile)()),
-    __param(2, (0, common_1.Body)()),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.UploadedFile)()),
+    __param(3, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object, upload_document_dto_1.UploadDocumentDto]),
+    __metadata("design:paramtypes", [String, Object, Object, Object]),
     __metadata("design:returntype", void 0)
-], CoursesController.prototype, "addDocument", null);
+], CoursesController.prototype, "createDocument", null);
 __decorate([
     (0, common_1.Post)(':id/assignments'),
-    (0, roles_decorator_1.Roles)(roles_enum_1.Role.Teacher),
+    (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, create_assignment_dto_1.CreateAssignmentDto]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
-], CoursesController.prototype, "addAssignment", null);
+], CoursesController.prototype, "createAssignment", null);
 __decorate([
     (0, common_1.Post)(':id/chat'),
-    (0, roles_decorator_1.Roles)(roles_enum_1.Role.Teacher, roles_enum_1.Role.Student, roles_enum_1.Role.Admin),
+    (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher, roles_enum_1.Role.Student),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, create_chat_message_dto_1.CreateChatMessageDto]),
+    __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", void 0)
-], CoursesController.prototype, "addChatMessage", null);
+], CoursesController.prototype, "createChatMessage", null);
 exports.CoursesController = CoursesController = __decorate([
     (0, common_1.Controller)('courses'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    __metadata("design:paramtypes", [courses_service_1.CoursesService])
+    __metadata("design:paramtypes", [courses_service_1.CoursesService,
+        quizzes_service_1.QuizzesService,
+        documents_service_1.DocumentsService,
+        assignments_service_1.AssignmentsService,
+        chat_service_1.ChatService])
 ], CoursesController);
 //# sourceMappingURL=courses.controller.js.map

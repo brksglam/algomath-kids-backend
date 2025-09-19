@@ -11,12 +11,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserSchema = exports.User = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
 const roles_enum_1 = require("../../common/enums/roles.enum");
 let User = class User {
     email;
     password;
     name;
-    roles;
+    role;
+    courses;
 };
 exports.User = User;
 __decorate([
@@ -32,9 +34,13 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "name", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [String], enum: roles_enum_1.Role, default: [roles_enum_1.Role.Student] }),
+    (0, mongoose_1.Prop)({ required: true, enum: roles_enum_1.Role, default: roles_enum_1.Role.Student }),
+    __metadata("design:type", String)
+], User.prototype, "role", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'Course' }], default: [] }),
     __metadata("design:type", Array)
-], User.prototype, "roles", void 0);
+], User.prototype, "courses", void 0);
 exports.User = User = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], User);

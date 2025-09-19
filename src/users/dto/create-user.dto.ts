@@ -1,4 +1,4 @@
-import { IsArray, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsEmail, IsEnum, IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { Role } from '../../common/enums/roles.enum';
 
 export class CreateUserDto {
@@ -13,8 +13,12 @@ export class CreateUserDto {
   @IsNotEmpty()
   name: string;
 
+  @IsEnum(Role)
+  @IsOptional()
+  role?: Role;
+
   @IsOptional()
   @IsArray()
-  @IsEnum(Role, { each: true })
-  roles?: Role[];
+  @IsMongoId({ each: true })
+  courses?: string[];
 }

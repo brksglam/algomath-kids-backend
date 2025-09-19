@@ -1,23 +1,21 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Role } from '../common/enums/roles.enum';
 import { UsersService } from '../users/users.service';
-import { CreateUserDto } from '../users/dto/create-user.dto';
 import { UserDocument } from '../users/schemas/user.schema';
+import { AdminCreateUserDto } from './dto/admin-create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
 export interface JwtPayload {
   sub: string;
   email: string;
-  roles: Role[];
+  role: Role;
 }
 
 @Injectable()
 export class AuthService {
-  private readonly saltRounds = 10;
-
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
@@ -29,16 +27,23 @@ export class AuthService {
       throw new ConflictException('Email already registered');
     }
 
-    const hashedPassword = await bcrypt.hash(registerDto.password, this.saltRounds);
-    const createUserDto: CreateUserDto = {
-      ...registerDto,
-      password: hashedPassword,
-    };
+    const role = registerDto.role ?? Role.Student;
+    if (role !== Role.Student) {
+      throw new ForbiddenException('Only students can self-register');
+    }
 
-    const user = await this.usersService.create(createUserDto);
-    const { password, ...safeUser } = user.toObject();
+    const user = await this.usersService.create({ ...registerDto, role });
+    return this.sanitizeUser(user);
+  }
 
-    return safeUser;
+  async adminCreateUser(adminCreateUserDto: AdminCreateUserDto) {
+    const existingUser = await this.usersService.findByEmail(adminCreateUserDto.email);
+    if (existingUser) {
+      throw new ConflictException('Email already registered');
+    }
+
+    const user = await this.usersService.create(adminCreateUserDto);
+    return this.sanitizeUser(user);
   }
 
   async login(loginDto: LoginDto) {
@@ -46,7 +51,7 @@ export class AuthService {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
-      roles: user.roles,
+      role: user.role,
     };
     const accessToken = await this.jwtService.signAsync(payload);
 
@@ -65,5 +70,10 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  private sanitizeUser(user: UserDocument) {
+    const { password, ...safeUser } = user.toObject();
+    return safeUser;
   }
 }

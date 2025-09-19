@@ -3,8 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 export declare class RedisService implements OnModuleDestroy {
     private readonly configService;
-    private readonly client;
+    private readonly logger;
+    private client?;
     constructor(configService: ConfigService);
+    isEnabled(): boolean;
     getClient(): Redis;
     get<T = string>(key: string): Promise<T | null>;
     set(key: string, value: string, ttlSeconds?: number): Promise<'OK' | null>;

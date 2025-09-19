@@ -1,56 +1,78 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger } from '@nestjs/common';
+import { config as loadEnv } from 'dotenv';
+loadEnv();
+
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
+import mongoose from 'mongoose';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { CoursesModule } from './courses/courses.module';
+import { DocumentsModule } from './documents/documents.module';
+import { AssignmentsModule } from './assignments/assignments.module';
+import { QuizzesModule } from './quizzes/quizzes.module';
+import { ChatModule } from './chat/chat.module';
+import { StorageModule } from './storage/storage.module';
+import { RedisModule } from './redis/redis.module';
+import { MessagingModule } from './messaging/messaging.module';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { CoursesModule } from './courses/courses.module';
-import { MessagingModule } from './messaging/messaging.module';
-import { RedisModule } from './redis/redis.module';
-import { StorageModule } from './storage/storage.module';
-import { UsersModule } from './users/users.module';
+
+const logger = new Logger('AppModule');
+
+const dbEnabled = process.env.MONGO_DISABLED !== 'true';
+const mongooseImports = dbEnabled
+  ? [
+      MongooseModule.forRootAsync({
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: async (configService: ConfigService) => {
+          const uri = configService.get<string>('MONGO_URI');
+          const options: MongooseModuleOptions = {};
+          if (!uri) {
+            logger.error('MONGO_URI is not defined. MongoDB connection will be skipped.');
+            const mongooseInstance = new mongoose.Mongoose();
+            options.connectionFactory = () => mongooseInstance.createConnection();
+          } else {
+            options.uri = uri;
+          }
+          return options;
+        },
+      }),
+    ]
+  : [];
+
+const dbModules = dbEnabled
+  ? [UsersModule, AuthModule, CoursesModule, DocumentsModule, AssignmentsModule, QuizzesModule, ChatModule]
+  : [];
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGODB_URI', 'mongodb://localhost:27017/algomath'),
-      }),
-    }),
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        const transport: Record<string, unknown> = {
-          host: configService.get<string>('MAIL_HOST', 'localhost'),
-          port: configService.get<number>('MAIL_PORT', 587),
+      useFactory: (configService: ConfigService) => ({
+        transport: {
+          host: configService.get<string>('MAIL_HOST'),
+          port: Number(configService.get<string>('MAIL_PORT') ?? 587),
           secure: configService.get<string>('MAIL_SECURE', 'false') === 'true',
-        };
-
-        const user = configService.get<string>('MAIL_USER');
-        const pass = configService.get<string>('MAIL_PASSWORD');
-        if (user && pass) {
-          transport['auth'] = { user, pass };
-        }
-
-        return {
-          transport,
-          defaults: {
-            from: configService.get<string>('MAIL_DEFAULT_FROM', 'Algomath Kids <no-reply@algomath.com>'),
+          auth: {
+            user: configService.get<string>('MAIL_USER'),
+            pass: configService.get<string>('MAIL_PASS'),
           },
-        };
-      },
+        },
+        defaults: {
+          from: configService.get<string>('MAIL_FROM', 'no-reply@example.com'),
+        },
+      }),
     }),
-    UsersModule,
-    AuthModule,
-    CoursesModule,
+    ...mongooseImports,
     StorageModule,
-    MessagingModule,
     RedisModule,
+    MessagingModule,
+    ...dbModules,
   ],
   controllers: [AppController],
   providers: [AppService],
