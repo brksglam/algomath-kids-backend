@@ -38,6 +38,18 @@ let CoursesService = class CoursesService {
     async findAll() {
         return this.courseModel.find().lean().exec();
     }
+    async findAllPaginated(page, limit) {
+        const [items, total] = await Promise.all([
+            this.courseModel
+                .find()
+                .skip((page - 1) * limit)
+                .limit(limit)
+                .lean()
+                .exec(),
+            this.courseModel.countDocuments().exec(),
+        ]);
+        return { items, total };
+    }
     async findOne(id) {
         const course = await this.courseModel.findById(id).lean().exec();
         if (!course) {

@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const chat_message_schema_1 = require("./schemas/chat-message.schema");
+const chat_policy_enum_1 = require("../common/enums/chat-policy.enum");
 const course_schema_1 = require("../courses/schemas/course.schema");
 let ChatService = class ChatService {
     chatModel;
@@ -25,14 +26,24 @@ let ChatService = class ChatService {
         this.chatModel = chatModel;
         this.courseModel = courseModel;
     }
-    async createMessage(courseId, senderId, content) {
+    async createMessage(courseId, senderId, content, recipientId) {
         const course = await this.courseModel.findById(courseId).exec();
         if (!course) {
             throw new common_1.NotFoundException('Course not found');
         }
+        const isTeacher = course.teachers.some((t) => t.equals(new mongoose_2.Types.ObjectId(senderId)));
+        const isStudent = course.students.some((s) => s.equals(new mongoose_2.Types.ObjectId(senderId)));
+        if (!isTeacher && !isStudent) {
+            throw new common_1.NotFoundException('You are not a member of this course');
+        }
+        const policy = course.chatPolicy ?? chat_policy_enum_1.ChatPolicy.StudentsWithTeacher;
+        if (policy === chat_policy_enum_1.ChatPolicy.TeacherToStudents && !isTeacher) {
+            throw new common_1.NotFoundException('Only teachers can send messages in this course');
+        }
         const message = await this.chatModel.create({
             course: course._id,
             sender: new mongoose_2.Types.ObjectId(senderId),
+            recipient: recipientId ? new mongoose_2.Types.ObjectId(recipientId) : undefined,
             content,
             createdAt: new Date(),
         });
@@ -41,10 +52,12 @@ let ChatService = class ChatService {
             .exec();
         return message.toObject();
     }
-    async findByCourse(courseId) {
+    async findByCourse(courseId, page = 1, limit = 20) {
         return this.chatModel
             .find({ course: courseId })
             .sort({ createdAt: 1 })
+            .skip((page - 1) * limit)
+            .limit(limit)
             .lean()
             .exec();
     }

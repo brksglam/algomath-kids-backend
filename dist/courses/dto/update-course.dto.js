@@ -12,12 +12,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateCourseDto = void 0;
 const mapped_types_1 = require("@nestjs/mapped-types");
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
+const chat_policy_enum_1 = require("../../common/enums/chat-policy.enum");
 const create_course_dto_1 = require("./create-course.dto");
 class UpdateCourseDto extends (0, mapped_types_1.PartialType)(create_course_dto_1.CreateCourseDto) {
     documents;
     assignments;
     quizzes;
     chats;
+    chatPolicy;
 }
 exports.UpdateCourseDto = UpdateCourseDto;
 __decorate([
@@ -44,4 +47,10 @@ __decorate([
     (0, class_validator_1.IsMongoId)({ each: true }),
     __metadata("design:type", Array)
 ], UpdateCourseDto.prototype, "chats", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ enum: chat_policy_enum_1.ChatPolicy, description: 'Kurs içi chat politikası' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEnum)(chat_policy_enum_1.ChatPolicy),
+    __metadata("design:type", String)
+], UpdateCourseDto.prototype, "chatPolicy", void 0);
 //# sourceMappingURL=update-course.dto.js.map

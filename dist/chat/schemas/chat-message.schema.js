@@ -15,18 +15,23 @@ const mongoose_2 = require("mongoose");
 let ChatMessage = class ChatMessage {
     course;
     sender;
+    recipient;
     content;
     createdAt;
 };
 exports.ChatMessage = ChatMessage;
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Course', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Course' }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], ChatMessage.prototype, "course", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'User', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], ChatMessage.prototype, "sender", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'User' }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], ChatMessage.prototype, "recipient", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)

@@ -23,7 +23,12 @@ let MessagingService = MessagingService_1 = class MessagingService {
         this.configService = configService;
     }
     async onModuleInit() {
-        await this.ensureConnection();
+        try {
+            await this.ensureConnection();
+        }
+        catch (error) {
+            this.logger.warn('RabbitMQ connection failed during init: ' + error.message);
+        }
     }
     async onModuleDestroy() {
         await this.channel?.close().catch((error) => this.logger.error('Failed to close RabbitMQ channel', error));
@@ -60,9 +65,15 @@ let MessagingService = MessagingService_1 = class MessagingService {
             this.logger.warn('RABBITMQ_URL is not configured');
             return undefined;
         }
-        this.connection = await (0, amqplib_1.connect)(url);
-        this.channel = await this.connection.createChannel();
-        return this.channel;
+        try {
+            this.connection = await (0, amqplib_1.connect)(url);
+            this.channel = await this.connection.createChannel();
+            return this.channel;
+        }
+        catch (error) {
+            this.logger.warn('RabbitMQ connection error: ' + error.message);
+            return undefined;
+        }
     }
 };
 exports.MessagingService = MessagingService;

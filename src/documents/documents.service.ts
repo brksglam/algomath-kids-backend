@@ -37,6 +37,7 @@ export class DocumentsService {
       description: createDocumentDto.description,
       url,
       uploadedBy: new Types.ObjectId(uploadedBy),
+      recipients: createDocumentDto.recipients?.map((id) => new Types.ObjectId(id)) ?? [],
     });
 
     await this.courseModel
@@ -55,6 +56,19 @@ export class DocumentsService {
 
   async findByCourse(courseId: string) {
     return this.documentModel.find({ course: courseId }).lean().exec();
+  }
+
+  async findByCoursePaginated(courseId: string, page: number, limit: number) {
+    const [items, total] = await Promise.all([
+      this.documentModel
+        .find({ course: courseId })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean()
+        .exec(),
+      this.documentModel.countDocuments({ course: courseId }).exec(),
+    ]);
+    return { items, total, page, limit };
   }
 
   async update(id: string, updateDocumentDto: UpdateDocumentDto) {

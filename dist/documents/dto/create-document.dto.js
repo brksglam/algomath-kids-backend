@@ -11,24 +11,36 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateDocumentDto = void 0;
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 class CreateDocumentDto {
     courseId;
     title;
     description;
+    recipients;
 }
 exports.CreateDocumentDto = CreateDocumentDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '66ed2a3f4f5e9b1234567890' }),
     (0, class_validator_1.IsMongoId)(),
     __metadata("design:type", String)
 ], CreateDocumentDto.prototype, "courseId", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Ders Notu 1' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateDocumentDto.prototype, "title", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'PDF ders notu' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateDocumentDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ type: [String], description: 'Belirtilirse sadece bu öğrencilere görünür' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsMongoId)({ each: true }),
+    __metadata("design:type", Array)
+], CreateDocumentDto.prototype, "recipients", void 0);
 //# sourceMappingURL=create-document.dto.js.map

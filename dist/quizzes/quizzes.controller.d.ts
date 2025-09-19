@@ -15,13 +15,18 @@ export declare class QuizzesController {
     }> & {
         __v: number;
     }>;
-    findByCourse(courseId: string): Promise<(import("mongoose").FlattenMaps<import("mongoose").Document<unknown, {}, import("./schemas/quiz.schema").Quiz, {}, {}> & import("./schemas/quiz.schema").Quiz & {
-        _id: import("mongoose").Types.ObjectId;
-    } & {
-        __v: number;
-    }> & Required<{
-        _id: import("mongoose").Types.ObjectId;
-    }>)[]>;
+    findByCourse(courseId: string, page?: number, limit?: number): Promise<{
+        items: (import("mongoose").FlattenMaps<import("mongoose").Document<unknown, {}, import("./schemas/quiz.schema").Quiz, {}, {}> & import("./schemas/quiz.schema").Quiz & {
+            _id: import("mongoose").Types.ObjectId;
+        } & {
+            __v: number;
+        }> & Required<{
+            _id: import("mongoose").Types.ObjectId;
+        }>)[];
+        total: number;
+        page: number;
+        limit: number;
+    }>;
     findOne(id: string): Promise<import("mongoose").FlattenMaps<import("mongoose").Document<unknown, {}, import("./schemas/quiz.schema").Quiz, {}, {}> & import("./schemas/quiz.schema").Quiz & {
         _id: import("mongoose").Types.ObjectId;
     } & {

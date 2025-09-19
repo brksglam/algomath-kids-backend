@@ -18,6 +18,7 @@ let DocumentEntity = class DocumentEntity {
     description;
     url;
     uploadedBy;
+    recipients;
 };
 exports.DocumentEntity = DocumentEntity;
 __decorate([
@@ -40,6 +41,10 @@ __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'User', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], DocumentEntity.prototype, "uploadedBy", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'User' }], default: [] }),
+    __metadata("design:type", Array)
+], DocumentEntity.prototype, "recipients", void 0);
 exports.DocumentEntity = DocumentEntity = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], DocumentEntity);

@@ -26,6 +26,18 @@ export declare class QuizzesService {
     }> & Required<{
         _id: import("mongoose").Types.ObjectId;
     }>)[]>;
+    findByCoursePaginated(courseId: string, page: number, limit: number): Promise<{
+        items: (import("mongoose").FlattenMaps<import("mongoose").Document<unknown, {}, Quiz, {}, {}> & Quiz & {
+            _id: import("mongoose").Types.ObjectId;
+        } & {
+            __v: number;
+        }> & Required<{
+            _id: import("mongoose").Types.ObjectId;
+        }>)[];
+        total: number;
+        page: number;
+        limit: number;
+    }>;
     findOne(id: string): Promise<import("mongoose").FlattenMaps<import("mongoose").Document<unknown, {}, Quiz, {}, {}> & Quiz & {
         _id: import("mongoose").Types.ObjectId;
     } & {

@@ -31,6 +31,20 @@ export class UsersService {
     return this.userModel.find().select('-password').lean().exec();
   }
 
+  async findAllPaginated(page: number, limit: number): Promise<{ items: User[]; total: number }> {
+    const [items, total] = await Promise.all([
+      this.userModel
+        .find()
+        .select('-password')
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean()
+        .exec(),
+      this.userModel.countDocuments().exec(),
+    ]);
+    return { items, total };
+  }
+
   async findById(id: string): Promise<UserDocument | null> {
     return this.userModel.findById(id).exec();
   }

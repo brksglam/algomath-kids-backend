@@ -13,7 +13,7 @@ export declare class ChatController {
     }> & {
         __v: number;
     }>;
-    findByCourse(courseId: string): Promise<(import("mongoose").FlattenMaps<import("mongoose").Document<unknown, {}, import("./schemas/chat-message.schema").ChatMessage, {}, {}> & import("./schemas/chat-message.schema").ChatMessage & {
+    findByCourse(courseId: string, page?: number, limit?: number): Promise<(import("mongoose").FlattenMaps<import("mongoose").Document<unknown, {}, import("./schemas/chat-message.schema").ChatMessage, {}, {}> & import("./schemas/chat-message.schema").ChatMessage & {
         _id: import("mongoose").Types.ObjectId;
     } & {
         __v: number;

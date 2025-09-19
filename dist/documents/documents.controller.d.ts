@@ -14,13 +14,18 @@ export declare class DocumentsController {
     }> & {
         __v: number;
     }>;
-    findByCourse(courseId: string): Promise<(import("mongoose").FlattenMaps<import("mongoose").Document<unknown, {}, import("./schemas/document.schema").DocumentEntity, {}, {}> & import("./schemas/document.schema").DocumentEntity & {
-        _id: import("mongoose").Types.ObjectId;
-    } & {
-        __v: number;
-    }> & Required<{
-        _id: import("mongoose").Types.ObjectId;
-    }>)[]>;
+    findByCourse(courseId: string, page?: number, limit?: number): Promise<{
+        items: (import("mongoose").FlattenMaps<import("mongoose").Document<unknown, {}, import("./schemas/document.schema").DocumentEntity, {}, {}> & import("./schemas/document.schema").DocumentEntity & {
+            _id: import("mongoose").Types.ObjectId;
+        } & {
+            __v: number;
+        }> & Required<{
+            _id: import("mongoose").Types.ObjectId;
+        }>)[];
+        total: number;
+        page: number;
+        limit: number;
+    }>;
     update(id: string, updateDocumentDto: UpdateDocumentDto): Promise<import("mongoose").FlattenMaps<import("mongoose").Document<unknown, {}, import("./schemas/document.schema").DocumentEntity, {}, {}> & import("./schemas/document.schema").DocumentEntity & {
         _id: import("mongoose").Types.ObjectId;
     } & {

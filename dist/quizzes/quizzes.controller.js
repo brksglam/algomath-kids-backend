@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.QuizzesController = void 0;
 const common_1 = require("@nestjs/common");
+const swagger_1 = require("@nestjs/swagger");
 const roles_decorator_1 = require("../common/decorators/roles.decorator");
 const roles_enum_1 = require("../common/enums/roles.enum");
 const jwt_auth_guard_1 = require("../common/guards/jwt-auth.guard");
@@ -30,8 +31,8 @@ let QuizzesController = class QuizzesController {
     create(createQuizDto) {
         return this.quizzesService.create(createQuizDto);
     }
-    findByCourse(courseId) {
-        return this.quizzesService.findByCourse(courseId);
+    findByCourse(courseId, page = 1, limit = 10) {
+        return this.quizzesService.findByCoursePaginated(courseId, +page, +limit);
     }
     findOne(id) {
         return this.quizzesService.findOne(id);
@@ -59,9 +60,14 @@ __decorate([
 __decorate([
     (0, common_1.Get)('course/:courseId'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher, roles_enum_1.Role.Student),
+    (0, swagger_1.ApiOperation)({ summary: 'Kursun quizlerini getir (sayfalanmış)' }),
+    (0, swagger_1.ApiQuery)({ name: 'page', required: false }),
+    (0, swagger_1.ApiQuery)({ name: 'limit', required: false }),
     __param(0, (0, common_1.Param)('courseId')),
+    __param(1, (0, common_1.Query)('page')),
+    __param(2, (0, common_1.Query)('limit')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", void 0)
 ], QuizzesController.prototype, "findByCourse", null);
 __decorate([
@@ -100,6 +106,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], QuizzesController.prototype, "submit", null);
 exports.QuizzesController = QuizzesController = __decorate([
+    (0, swagger_1.ApiTags)('Quizzes'),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Controller)('quizzes'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     __metadata("design:paramtypes", [quizzes_service_1.QuizzesService])

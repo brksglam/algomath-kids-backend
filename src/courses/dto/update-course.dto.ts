@@ -1,5 +1,7 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { IsArray, IsMongoId, IsOptional } from 'class-validator';
+import { IsArray, IsEnum, IsMongoId, IsOptional } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ChatPolicy } from '../../common/enums/chat-policy.enum';
 import { CreateCourseDto } from './create-course.dto';
 
 export class UpdateCourseDto extends PartialType(CreateCourseDto) {
@@ -22,4 +24,9 @@ export class UpdateCourseDto extends PartialType(CreateCourseDto) {
   @IsArray()
   @IsMongoId({ each: true })
   chats?: string[];
+
+  @ApiPropertyOptional({ enum: ChatPolicy, description: 'Kurs içi chat politikası' })
+  @IsOptional()
+  @IsEnum(ChatPolicy)
+  chatPolicy?: ChatPolicy;
 }

@@ -18,6 +18,8 @@ import { MessagingModule } from './messaging/messaging.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ProfilesModule } from './profiles/profiles.module';
+import { SchedulingModule } from './scheduling/scheduling.module';
 
 const logger = new Logger('AppModule');
 
@@ -55,16 +57,16 @@ const dbModules = dbEnabled
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         transport: {
-          host: configService.get<string>('MAIL_HOST'),
-          port: Number(configService.get<string>('MAIL_PORT') ?? 587),
-          secure: configService.get<string>('MAIL_SECURE', 'false') === 'true',
+          host: configService.get<string>('MAIL_HOST') || configService.get<string>('SMTP_HOST'),
+          port: Number(configService.get<string>('MAIL_PORT') || configService.get<string>('SMTP_PORT') || 587),
+          secure: (configService.get<string>('MAIL_SECURE') || 'false') === 'true',
           auth: {
-            user: configService.get<string>('MAIL_USER'),
-            pass: configService.get<string>('MAIL_PASS'),
+            user: configService.get<string>('MAIL_USER') || configService.get<string>('SMTP_USER'),
+            pass: configService.get<string>('MAIL_PASS') || configService.get<string>('SMTP_PASS'),
           },
         },
         defaults: {
-          from: configService.get<string>('MAIL_FROM', 'no-reply@example.com'),
+          from: configService.get<string>('MAIL_FROM') || configService.get<string>('CONTACT_EMAIL') || 'no-reply@example.com',
         },
       }),
     }),
@@ -73,6 +75,8 @@ const dbModules = dbEnabled
     RedisModule,
     MessagingModule,
     ...dbModules,
+    ProfilesModule,
+    SchedulingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

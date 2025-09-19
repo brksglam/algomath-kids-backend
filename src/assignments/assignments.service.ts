@@ -29,6 +29,7 @@ export class AssignmentsService {
       description: createAssignmentDto.description,
       deadline: createAssignmentDto.deadline ? new Date(createAssignmentDto.deadline) : undefined,
       assignedTo: createAssignmentDto.assignedTo?.map((id) => new Types.ObjectId(id)) ?? [],
+      recipients: createAssignmentDto.recipients?.map((id) => new Types.ObjectId(id)) ?? [],
     });
 
     await this.courseModel
@@ -40,6 +41,19 @@ export class AssignmentsService {
 
   async findByCourse(courseId: string) {
     return this.assignmentModel.find({ course: courseId }).lean().exec();
+  }
+
+  async findByCoursePaginated(courseId: string, page: number, limit: number) {
+    const [items, total] = await Promise.all([
+      this.assignmentModel
+        .find({ course: courseId })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean()
+        .exec(),
+      this.assignmentModel.countDocuments({ course: courseId }).exec(),
+    ]);
+    return { items, total, page, limit };
   }
 
   async update(id: string, updateAssignmentDto: UpdateAssignmentDto) {

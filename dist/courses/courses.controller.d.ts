@@ -27,13 +27,10 @@ export declare class CoursesController {
     }> & {
         __v: number;
     }>;
-    findAll(): Promise<(import("mongoose").FlattenMaps<import("mongoose").Document<unknown, {}, import("./schemas/course.schema").Course, {}, {}> & import("./schemas/course.schema").Course & {
-        _id: import("mongoose").Types.ObjectId;
-    } & {
-        __v: number;
-    }> & Required<{
-        _id: import("mongoose").Types.ObjectId;
-    }>)[]>;
+    findAll(page?: number, limit?: number): Promise<{
+        items: unknown[];
+        total: number;
+    }>;
     getDetail(id: string): Promise<import("mongoose").FlattenMaps<import("mongoose").Document<unknown, {}, import("./schemas/course.schema").Course, {}, {}> & import("./schemas/course.schema").Course & {
         _id: import("mongoose").Types.ObjectId;
     } & {

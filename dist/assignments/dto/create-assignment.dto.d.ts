@@ -4,4 +4,5 @@ export declare class CreateAssignmentDto {
     description?: string;
     deadline?: string;
     assignedTo?: string[];
+    recipients?: string[];
 }

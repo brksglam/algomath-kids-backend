@@ -24,6 +24,10 @@ export declare class CoursesService {
     }> & Required<{
         _id: Types.ObjectId;
     }>)[]>;
+    findAllPaginated(page: number, limit: number): Promise<{
+        items: unknown[];
+        total: number;
+    }>;
     findOne(id: string): Promise<import("mongoose").FlattenMaps<import("mongoose").Document<unknown, {}, Course, {}, {}> & Course & {
         _id: Types.ObjectId;
     } & {

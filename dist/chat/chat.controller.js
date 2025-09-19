@@ -20,6 +20,7 @@ const jwt_auth_guard_1 = require("../common/guards/jwt-auth.guard");
 const roles_guard_1 = require("../common/guards/roles.guard");
 const chat_service_1 = require("./chat.service");
 const create_chat_message_dto_1 = require("./dto/create-chat-message.dto");
+const swagger_1 = require("@nestjs/swagger");
 let ChatController = class ChatController {
     chatService;
     constructor(chatService) {
@@ -27,16 +28,17 @@ let ChatController = class ChatController {
     }
     create(createChatMessageDto, req) {
         const user = req.user;
-        return this.chatService.createMessage(createChatMessageDto.courseId, user.userId, createChatMessageDto.content);
+        return this.chatService.createMessage(createChatMessageDto.courseId, user.userId, createChatMessageDto.content, createChatMessageDto.recipientId);
     }
-    findByCourse(courseId) {
-        return this.chatService.findByCourse(courseId);
+    findByCourse(courseId, page = 1, limit = 20) {
+        return this.chatService.findByCourse(courseId, +page, +limit);
     }
 };
 exports.ChatController = ChatController;
 __decorate([
     (0, common_1.Post)(),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher, roles_enum_1.Role.Student),
+    (0, swagger_1.ApiOperation)({ summary: 'Kurs feed mesajı veya DM gönder (recipientId varsa DM)' }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
@@ -46,12 +48,19 @@ __decorate([
 __decorate([
     (0, common_1.Get)('course/:courseId'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher, roles_enum_1.Role.Student),
+    (0, swagger_1.ApiOperation)({ summary: 'Kurs feed mesajlarını getir' }),
+    (0, swagger_1.ApiQuery)({ name: 'page', required: false }),
+    (0, swagger_1.ApiQuery)({ name: 'limit', required: false }),
     __param(0, (0, common_1.Param)('courseId')),
+    __param(1, (0, common_1.Query)('page')),
+    __param(2, (0, common_1.Query)('limit')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", void 0)
 ], ChatController.prototype, "findByCourse", null);
 exports.ChatController = ChatController = __decorate([
+    (0, swagger_1.ApiTags)('Chat'),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Controller)('chat'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     __metadata("design:paramtypes", [chat_service_1.ChatService])

@@ -34,6 +34,9 @@ export class Assignment {
   @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }], default: [] })
   assignedTo: Types.ObjectId[];
 
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }], default: [] })
+  recipients: Types.ObjectId[];
+
   @Prop({ type: [AssignmentSubmissionSchema], default: [] })
   submissions: AssignmentSubmission[];
 }

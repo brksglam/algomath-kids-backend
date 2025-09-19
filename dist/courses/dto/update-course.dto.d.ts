@@ -1,3 +1,4 @@
+import { ChatPolicy } from '../../common/enums/chat-policy.enum';
 import { CreateCourseDto } from './create-course.dto';
 declare const UpdateCourseDto_base: import("@nestjs/mapped-types").MappedType<Partial<CreateCourseDto>>;
 export declare class UpdateCourseDto extends UpdateCourseDto_base {
@@ -5,5 +6,6 @@ export declare class UpdateCourseDto extends UpdateCourseDto_base {
     assignments?: string[];
     quizzes?: string[];
     chats?: string[];
+    chatPolicy?: ChatPolicy;
 }
 export {};

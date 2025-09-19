@@ -11,7 +11,11 @@ export class MessagingService implements OnModuleInit, OnModuleDestroy {
   constructor(private readonly configService: ConfigService) {}
 
   async onModuleInit() {
-    await this.ensureConnection();
+    try {
+      await this.ensureConnection();
+    } catch (error) {
+      this.logger.warn('RabbitMQ connection failed during init: ' + (error as Error).message);
+    }
   }
 
   async onModuleDestroy() {
@@ -60,8 +64,13 @@ export class MessagingService implements OnModuleInit, OnModuleDestroy {
       return undefined;
     }
 
-    this.connection = await connect(url);
-    this.channel = await this.connection.createChannel();
-    return this.channel;
+    try {
+      this.connection = await connect(url);
+      this.channel = await this.connection.createChannel();
+      return this.channel;
+    } catch (error) {
+      this.logger.warn('RabbitMQ connection error: ' + (error as Error).message);
+      return undefined;
+    }
   }
 }

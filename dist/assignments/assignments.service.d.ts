@@ -26,6 +26,18 @@ export declare class AssignmentsService {
     }> & Required<{
         _id: Types.ObjectId;
     }>)[]>;
+    findByCoursePaginated(courseId: string, page: number, limit: number): Promise<{
+        items: (import("mongoose").FlattenMaps<import("mongoose").Document<unknown, {}, Assignment, {}, {}> & Assignment & {
+            _id: Types.ObjectId;
+        } & {
+            __v: number;
+        }> & Required<{
+            _id: Types.ObjectId;
+        }>)[];
+        total: number;
+        page: number;
+        limit: number;
+    }>;
     update(id: string, updateAssignmentDto: UpdateAssignmentDto): Promise<import("mongoose").FlattenMaps<import("mongoose").Document<unknown, {}, Assignment, {}, {}> & Assignment & {
         _id: Types.ObjectId;
     } & {

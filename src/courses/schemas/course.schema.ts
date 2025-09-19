@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Schema as MongooseSchema, Types } from 'mongoose';
+import { ChatPolicy } from '../../common/enums/chat-policy.enum';
 
 export type CourseDocument = HydratedDocument<Course>;
 
@@ -28,6 +29,9 @@ export class Course {
 
   @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'ChatMessage' }], default: [] })
   chats: Types.ObjectId[];
+
+  @Prop({ type: String, enum: ChatPolicy, default: ChatPolicy.StudentsWithTeacher })
+  chatPolicy: ChatPolicy;
 }
 
 export const CourseSchema = SchemaFactory.createForClass(Course);

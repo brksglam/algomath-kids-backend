@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/enums/roles.enum';
@@ -9,6 +10,8 @@ import { SubmitQuizDto } from './dto/submit-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
 import { QuizzesService } from './quizzes.service';
 
+@ApiTags('Quizzes')
+@ApiBearerAuth()
 @Controller('quizzes')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class QuizzesController {
@@ -22,8 +25,11 @@ export class QuizzesController {
 
   @Get('course/:courseId')
   @Roles(Role.Admin, Role.Teacher, Role.Student)
-  findByCourse(@Param('courseId') courseId: string) {
-    return this.quizzesService.findByCourse(courseId);
+  @ApiOperation({ summary: 'Kursun quizlerini getir (sayfalanmış)' })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'limit', required: false })
+  findByCourse(@Param('courseId') courseId: string, @Query('page') page = 1, @Query('limit') limit = 10) {
+    return this.quizzesService.findByCoursePaginated(courseId, +page, +limit);
   }
 
   @Get(':id')

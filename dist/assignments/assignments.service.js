@@ -39,6 +39,7 @@ let AssignmentsService = class AssignmentsService {
             description: createAssignmentDto.description,
             deadline: createAssignmentDto.deadline ? new Date(createAssignmentDto.deadline) : undefined,
             assignedTo: createAssignmentDto.assignedTo?.map((id) => new mongoose_2.Types.ObjectId(id)) ?? [],
+            recipients: createAssignmentDto.recipients?.map((id) => new mongoose_2.Types.ObjectId(id)) ?? [],
         });
         await this.courseModel
             .findByIdAndUpdate(course._id, { $addToSet: { assignments: assignment._id } })
@@ -47,6 +48,18 @@ let AssignmentsService = class AssignmentsService {
     }
     async findByCourse(courseId) {
         return this.assignmentModel.find({ course: courseId }).lean().exec();
+    }
+    async findByCoursePaginated(courseId, page, limit) {
+        const [items, total] = await Promise.all([
+            this.assignmentModel
+                .find({ course: courseId })
+                .skip((page - 1) * limit)
+                .limit(limit)
+                .lean()
+                .exec(),
+            this.assignmentModel.countDocuments({ course: courseId }).exec(),
+        ]);
+        return { items, total, page, limit };
     }
     async update(id, updateAssignmentDto) {
         const update = { ...updateAssignmentDto };

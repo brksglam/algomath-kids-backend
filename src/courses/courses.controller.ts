@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request, Express } from 'express';
 import multer from 'multer';
@@ -19,6 +20,8 @@ import { CreateDocumentDto } from '../documents/dto/create-document.dto';
 import { CreateAssignmentDto } from '../assignments/dto/create-assignment.dto';
 import { CreateChatMessageDto } from '../chat/dto/create-chat-message.dto';
 
+@ApiTags('Courses')
+@ApiBearerAuth()
 @Controller('courses')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class CoursesController {
@@ -32,28 +35,36 @@ export class CoursesController {
 
   @Post()
   @Roles(Role.Admin, Role.Teacher)
+  @ApiOperation({ summary: 'Kurs oluştur' })
   create(@Body() createCourseDto: CreateCourseDto) {
     return this.coursesService.create(createCourseDto);
   }
 
   @Get()
-  findAll() {
-    return this.coursesService.findAll();
+  @ApiOkResponse({ description: 'Paginated course list' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiOperation({ summary: 'Kursları listele (sayfalı)' })
+  findAll(@Query('page') page = 1, @Query('limit') limit = 10) {
+    return this.coursesService.findAllPaginated(+page, +limit);
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Kurs detayını getir' })
   getDetail(@Param('id') id: string) {
     return this.coursesService.findOneWithRelations(id);
   }
 
   @Patch(':id')
   @Roles(Role.Admin, Role.Teacher)
+  @ApiOperation({ summary: 'Kursu güncelle (chatPolicy dahil)' })
   update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto) {
     return this.coursesService.update(id, updateCourseDto);
   }
 
   @Delete(':id')
   @Roles(Role.Admin, Role.Teacher)
+  @ApiOperation({ summary: 'Kursu sil' })
   remove(@Param('id') id: string) {
     return this.coursesService.remove(id);
   }
@@ -85,6 +96,7 @@ export class CoursesController {
   // Nested: Quizzes
   @Post(':id/quizzes')
   @Roles(Role.Teacher)
+  @ApiOperation({ summary: 'Kursa quiz oluştur' })
   createQuiz(@Param('id') courseId: string, @Body() dto: Omit<CreateQuizDto, 'courseId'> & Partial<CreateQuizDto>) {
     const payload: CreateQuizDto = { ...dto, courseId } as CreateQuizDto;
     return this.quizzesService.create(payload);
@@ -92,6 +104,7 @@ export class CoursesController {
 
   @Get(':id/quizzes')
   @Roles(Role.Admin, Role.Teacher, Role.Student)
+  @ApiOperation({ summary: 'Kursun quizlerini getir' })
   listQuizzes(@Param('id') courseId: string) {
     return this.quizzesService.findByCourse(courseId);
   }
@@ -99,6 +112,7 @@ export class CoursesController {
   // Nested: Documents (S3 upload)
   @Post(':id/documents')
   @Roles(Role.Admin, Role.Teacher)
+  @ApiOperation({ summary: 'Kursa doküman yükle (S3, opsiyonel öğrenci hedefleme)' })
   @UseInterceptors(FileInterceptor('file', { storage: multer.memoryStorage() }))
   createDocument(
     @Param('id') courseId: string,
@@ -114,6 +128,7 @@ export class CoursesController {
   // Nested: Assignments
   @Post(':id/assignments')
   @Roles(Role.Admin, Role.Teacher)
+  @ApiOperation({ summary: 'Kursa ödev oluştur (hedef atama yapılabilir)' })
   createAssignment(@Param('id') courseId: string, @Body() dto: Omit<CreateAssignmentDto, 'courseId'> & Partial<CreateAssignmentDto>) {
     const payload: CreateAssignmentDto = { ...dto, courseId } as CreateAssignmentDto;
     return this.assignmentsService.create(payload);
@@ -122,6 +137,7 @@ export class CoursesController {
   // Nested: Chat messages
   @Post(':id/chat')
   @Roles(Role.Admin, Role.Teacher, Role.Student)
+  @ApiOperation({ summary: 'Kurs feed mesajı gönder (ChatPolicy uygulanır)' })
   createChatMessage(
     @Param('id') courseId: string,
     @Body() dto: Pick<CreateChatMessageDto, 'content'>,

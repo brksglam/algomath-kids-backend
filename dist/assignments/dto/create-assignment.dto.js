@@ -11,36 +11,50 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateAssignmentDto = void 0;
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 class CreateAssignmentDto {
     courseId;
     title;
     description;
     deadline;
     assignedTo;
+    recipients;
 }
 exports.CreateAssignmentDto = CreateAssignmentDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '66ed2a3f4f5e9b1234567890' }),
     (0, class_validator_1.IsMongoId)(),
     __metadata("design:type", String)
 ], CreateAssignmentDto.prototype, "courseId", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Ödev 1' }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateAssignmentDto.prototype, "title", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Haftalık alıştırmalar' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateAssignmentDto.prototype, "description", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: '2025-12-31T23:59:59.000Z' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsDateString)(),
     __metadata("design:type", String)
 ], CreateAssignmentDto.prototype, "deadline", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ type: [String] }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsMongoId)({ each: true }),
     __metadata("design:type", Array)
 ], CreateAssignmentDto.prototype, "assignedTo", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Visible only to these students if provided', type: [String] }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsMongoId)({ each: true }),
+    __metadata("design:type", Array)
+], CreateAssignmentDto.prototype, "recipients", void 0);
 //# sourceMappingURL=create-assignment.dto.js.map

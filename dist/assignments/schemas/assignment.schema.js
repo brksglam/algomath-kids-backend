@@ -40,6 +40,7 @@ let Assignment = class Assignment {
     description;
     deadline;
     assignedTo;
+    recipients;
     submissions;
 };
 exports.Assignment = Assignment;
@@ -63,6 +64,10 @@ __decorate([
     (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'User' }], default: [] }),
     __metadata("design:type", Array)
 ], Assignment.prototype, "assignedTo", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'User' }], default: [] }),
+    __metadata("design:type", Array)
+], Assignment.prototype, "recipients", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ type: [AssignmentSubmissionSchema], default: [] }),
     __metadata("design:type", Array)

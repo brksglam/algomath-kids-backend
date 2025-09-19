@@ -53,6 +53,19 @@ export class QuizzesService {
     return this.quizModel.find({ course: courseId }).lean().exec();
   }
 
+  async findByCoursePaginated(courseId: string, page: number, limit: number) {
+    const [items, total] = await Promise.all([
+      this.quizModel
+        .find({ course: courseId })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean()
+        .exec(),
+      this.quizModel.countDocuments({ course: courseId }).exec(),
+    ]);
+    return { items, total, page, limit };
+  }
+
   async findOne(id: string) {
     const quiz = await this.quizModel.findById(id).lean().exec();
     if (!quiz) {

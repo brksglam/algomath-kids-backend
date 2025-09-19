@@ -6,6 +6,7 @@ export declare class DocumentEntity {
     description?: string;
     url: string;
     uploadedBy: Types.ObjectId;
+    recipients: Types.ObjectId[];
 }
 export declare const DocumentSchema: MongooseSchema<DocumentEntity, import("mongoose").Model<DocumentEntity, any, any, any, import("mongoose").Document<unknown, any, DocumentEntity, any, {}> & DocumentEntity & {
     _id: Types.ObjectId;

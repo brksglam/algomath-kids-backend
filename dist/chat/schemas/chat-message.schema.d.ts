@@ -1,8 +1,9 @@
 import { HydratedDocument, Schema as MongooseSchema, Types } from 'mongoose';
 export type ChatMessageDocument = HydratedDocument<ChatMessage>;
 export declare class ChatMessage {
-    course: Types.ObjectId;
+    course?: Types.ObjectId;
     sender: Types.ObjectId;
+    recipient?: Types.ObjectId;
     content: string;
     createdAt: Date;
 }

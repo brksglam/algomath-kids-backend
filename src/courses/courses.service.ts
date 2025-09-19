@@ -30,6 +30,19 @@ export class CoursesService {
     return this.courseModel.find().lean().exec();
   }
 
+  async findAllPaginated(page: number, limit: number): Promise<{ items: unknown[]; total: number }> {
+    const [items, total] = await Promise.all([
+      this.courseModel
+        .find()
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean()
+        .exec(),
+      this.courseModel.countDocuments().exec(),
+    ]);
+    return { items, total };
+  }
+
   async findOne(id: string) {
     const course = await this.courseModel.findById(id).lean().exec();
     if (!course) {

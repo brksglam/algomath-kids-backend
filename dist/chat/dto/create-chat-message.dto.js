@@ -11,17 +11,27 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateChatMessageDto = void 0;
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 class CreateChatMessageDto {
     courseId;
     content;
+    recipientId;
 }
 exports.CreateChatMessageDto = CreateChatMessageDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '66ed2a3f4f5e9b1234567890' }),
     (0, class_validator_1.IsMongoId)(),
     __metadata("design:type", String)
 ], CreateChatMessageDto.prototype, "courseId", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Merhaba sınıf!' }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateChatMessageDto.prototype, "content", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false, description: 'DM için hedef kullanıcı' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsMongoId)(),
+    __metadata("design:type", String)
+], CreateChatMessageDto.prototype, "recipientId", void 0);
 //# sourceMappingURL=create-chat-message.dto.js.map

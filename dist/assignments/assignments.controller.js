@@ -27,6 +27,7 @@ const assignments_service_1 = require("./assignments.service");
 const assign_students_dto_1 = require("./dto/assign-students.dto");
 const create_assignment_dto_1 = require("./dto/create-assignment.dto");
 const update_assignment_dto_1 = require("./dto/update-assignment.dto");
+const swagger_1 = require("@nestjs/swagger");
 let AssignmentsController = class AssignmentsController {
     assignmentsService;
     constructor(assignmentsService) {
@@ -35,8 +36,8 @@ let AssignmentsController = class AssignmentsController {
     create(createAssignmentDto) {
         return this.assignmentsService.create(createAssignmentDto);
     }
-    findByCourse(courseId) {
-        return this.assignmentsService.findByCourse(courseId);
+    findByCourse(courseId, page = 1, limit = 10) {
+        return this.assignmentsService.findByCoursePaginated(courseId, +page, +limit);
     }
     update(id, updateAssignmentDto) {
         return this.assignmentsService.update(id, updateAssignmentDto);
@@ -65,8 +66,10 @@ __decorate([
     (0, common_1.Get)('course/:courseId'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher, roles_enum_1.Role.Student),
     __param(0, (0, common_1.Param)('courseId')),
+    __param(1, (0, common_1.Query)('page')),
+    __param(2, (0, common_1.Query)('limit')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", void 0)
 ], AssignmentsController.prototype, "findByCourse", null);
 __decorate([
@@ -99,6 +102,8 @@ __decorate([
     (0, common_1.Post)(':id/submissions'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Student),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', { storage: multer_1.default.memoryStorage() })),
+    (0, swagger_1.ApiConsumes)('multipart/form-data'),
+    (0, swagger_1.ApiBody)({ schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' } } } }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.UploadedFile)()),
     __param(2, (0, common_1.Req)()),
@@ -107,6 +112,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AssignmentsController.prototype, "submit", null);
 exports.AssignmentsController = AssignmentsController = __decorate([
+    (0, swagger_1.ApiTags)('Assignments'),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Controller)('assignments'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     __metadata("design:paramtypes", [assignments_service_1.AssignmentsService])

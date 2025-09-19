@@ -8,6 +8,10 @@ export declare class UsersService {
     constructor(userModel: Model<UserDocument>);
     create(createUserDto: CreateUserDto): Promise<UserDocument>;
     findAll(): Promise<User[]>;
+    findAllPaginated(page: number, limit: number): Promise<{
+        items: User[];
+        total: number;
+    }>;
     findById(id: string): Promise<UserDocument | null>;
     findByEmail(email: string): Promise<UserDocument | null>;
     update(id: string, updateUserDto: UpdateUserDto): Promise<User>;

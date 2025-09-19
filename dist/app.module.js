@@ -29,6 +29,8 @@ const messaging_module_1 = require("./messaging/messaging.module");
 const mailer_1 = require("@nestjs-modules/mailer");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
+const profiles_module_1 = require("./profiles/profiles.module");
+const scheduling_module_1 = require("./scheduling/scheduling.module");
 const logger = new common_1.Logger('AppModule');
 const dbEnabled = process.env.MONGO_DISABLED !== 'true';
 const mongooseImports = dbEnabled
@@ -67,16 +69,16 @@ exports.AppModule = AppModule = __decorate([
                 inject: [config_1.ConfigService],
                 useFactory: (configService) => ({
                     transport: {
-                        host: configService.get('MAIL_HOST'),
-                        port: Number(configService.get('MAIL_PORT') ?? 587),
-                        secure: configService.get('MAIL_SECURE', 'false') === 'true',
+                        host: configService.get('MAIL_HOST') || configService.get('SMTP_HOST'),
+                        port: Number(configService.get('MAIL_PORT') || configService.get('SMTP_PORT') || 587),
+                        secure: (configService.get('MAIL_SECURE') || 'false') === 'true',
                         auth: {
-                            user: configService.get('MAIL_USER'),
-                            pass: configService.get('MAIL_PASS'),
+                            user: configService.get('MAIL_USER') || configService.get('SMTP_USER'),
+                            pass: configService.get('MAIL_PASS') || configService.get('SMTP_PASS'),
                         },
                     },
                     defaults: {
-                        from: configService.get('MAIL_FROM', 'no-reply@example.com'),
+                        from: configService.get('MAIL_FROM') || configService.get('CONTACT_EMAIL') || 'no-reply@example.com',
                     },
                 }),
             }),
@@ -85,6 +87,8 @@ exports.AppModule = AppModule = __decorate([
             redis_module_1.RedisModule,
             messaging_module_1.MessagingModule,
             ...dbModules,
+            profiles_module_1.ProfilesModule,
+            scheduling_module_1.SchedulingModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

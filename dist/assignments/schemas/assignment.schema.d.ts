@@ -11,6 +11,7 @@ export declare class Assignment {
     description?: string;
     deadline?: Date;
     assignedTo: Types.ObjectId[];
+    recipients: Types.ObjectId[];
     submissions: AssignmentSubmission[];
 }
 export declare const AssignmentSchema: MongooseSchema<Assignment, import("mongoose").Model<Assignment, any, any, any, import("mongoose").Document<unknown, any, Assignment, any, {}> & Assignment & {

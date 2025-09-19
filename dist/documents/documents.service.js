@@ -47,6 +47,7 @@ let DocumentsService = class DocumentsService {
             description: createDocumentDto.description,
             url,
             uploadedBy: new mongoose_2.Types.ObjectId(uploadedBy),
+            recipients: createDocumentDto.recipients?.map((id) => new mongoose_2.Types.ObjectId(id)) ?? [],
         });
         await this.courseModel
             .findByIdAndUpdate(course._id, { $addToSet: { documents: document._id } })
@@ -60,6 +61,18 @@ let DocumentsService = class DocumentsService {
     }
     async findByCourse(courseId) {
         return this.documentModel.find({ course: courseId }).lean().exec();
+    }
+    async findByCoursePaginated(courseId, page, limit) {
+        const [items, total] = await Promise.all([
+            this.documentModel
+                .find({ course: courseId })
+                .skip((page - 1) * limit)
+                .limit(limit)
+                .lean()
+                .exec(),
+            this.documentModel.countDocuments({ course: courseId }).exec(),
+        ]);
+        return { items, total, page, limit };
     }
     async update(id, updateDocumentDto) {
         const document = await this.documentModel

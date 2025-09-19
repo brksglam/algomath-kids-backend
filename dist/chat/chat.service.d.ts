@@ -5,7 +5,7 @@ export declare class ChatService {
     private readonly chatModel;
     private readonly courseModel;
     constructor(chatModel: Model<ChatMessageDocument>, courseModel: Model<CourseDocument>);
-    createMessage(courseId: string, senderId: string, content: string): Promise<import("mongoose").Document<unknown, {}, ChatMessage, {}, {}> & ChatMessage & {
+    createMessage(courseId: string, senderId: string, content: string, recipientId?: string): Promise<import("mongoose").Document<unknown, {}, ChatMessage, {}, {}> & ChatMessage & {
         _id: Types.ObjectId;
     } & {
         __v: number;
@@ -14,7 +14,7 @@ export declare class ChatService {
     }> & {
         __v: number;
     }>;
-    findByCourse(courseId: string): Promise<(import("mongoose").FlattenMaps<import("mongoose").Document<unknown, {}, ChatMessage, {}, {}> & ChatMessage & {
+    findByCourse(courseId: string, page?: number, limit?: number): Promise<(import("mongoose").FlattenMaps<import("mongoose").Document<unknown, {}, ChatMessage, {}, {}> & ChatMessage & {
         _id: Types.ObjectId;
     } & {
         __v: number;

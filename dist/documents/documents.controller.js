@@ -26,6 +26,7 @@ const roles_guard_1 = require("../common/guards/roles.guard");
 const create_document_dto_1 = require("./dto/create-document.dto");
 const update_document_dto_1 = require("./dto/update-document.dto");
 const documents_service_1 = require("./documents.service");
+const swagger_1 = require("@nestjs/swagger");
 let DocumentsController = class DocumentsController {
     documentsService;
     constructor(documentsService) {
@@ -35,8 +36,8 @@ let DocumentsController = class DocumentsController {
         const user = req.user;
         return this.documentsService.create(createDocumentDto, file, user.userId);
     }
-    findByCourse(courseId) {
-        return this.documentsService.findByCourse(courseId);
+    findByCourse(courseId, page = 1, limit = 10) {
+        return this.documentsService.findByCoursePaginated(courseId, +page, +limit);
     }
     update(id, updateDocumentDto) {
         return this.documentsService.update(id, updateDocumentDto);
@@ -50,6 +51,9 @@ __decorate([
     (0, common_1.Post)(),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', { storage: multer_1.default.memoryStorage() })),
+    (0, swagger_1.ApiConsumes)('multipart/form-data'),
+    (0, swagger_1.ApiBody)({ schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' }, title: { type: 'string' }, description: { type: 'string' }, courseId: { type: 'string' } } } }),
+    (0, swagger_1.ApiOperation)({ summary: 'Doküman yükle (S3) ve kursa bağla' }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.UploadedFile)()),
     __param(2, (0, common_1.Req)()),
@@ -60,14 +64,18 @@ __decorate([
 __decorate([
     (0, common_1.Get)('course/:courseId'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher, roles_enum_1.Role.Student),
+    (0, swagger_1.ApiOperation)({ summary: 'Kursun dokümanlarını getir (sayfalı)' }),
     __param(0, (0, common_1.Param)('courseId')),
+    __param(1, (0, common_1.Query)('page')),
+    __param(2, (0, common_1.Query)('limit')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", void 0)
 ], DocumentsController.prototype, "findByCourse", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher),
+    (0, swagger_1.ApiOperation)({ summary: 'Doküman güncelle' }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -77,12 +85,15 @@ __decorate([
 __decorate([
     (0, common_1.Delete)(':id'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher),
+    (0, swagger_1.ApiOperation)({ summary: 'Doküman sil' }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], DocumentsController.prototype, "remove", null);
 exports.DocumentsController = DocumentsController = __decorate([
+    (0, swagger_1.ApiTags)('Documents'),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Controller)('documents'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     __metadata("design:paramtypes", [documents_service_1.DocumentsService])
