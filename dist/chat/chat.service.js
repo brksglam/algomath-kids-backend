@@ -36,7 +36,8 @@ let ChatService = class ChatService {
         if (!isTeacher && !isStudent) {
             throw new common_1.NotFoundException('You are not a member of this course');
         }
-        const policy = course.chatPolicy ?? chat_policy_enum_1.ChatPolicy.StudentsWithTeacher;
+        const policy = course.chatPolicy ??
+            chat_policy_enum_1.ChatPolicy.StudentsWithTeacher;
         if (policy === chat_policy_enum_1.ChatPolicy.TeacherToStudents && !isTeacher) {
             throw new common_1.NotFoundException('Only teachers can send messages in this course');
         }

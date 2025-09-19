@@ -16,7 +16,10 @@ export class CreateDocumentDto {
   @IsString()
   description?: string;
 
-  @ApiPropertyOptional({ type: [String], description: 'Belirtilirse sadece bu öğrencilere görünür' })
+  @ApiPropertyOptional({
+    type: [String],
+    description: 'Belirtilirse sadece bu öğrencilere görünür',
+  })
   @IsOptional()
   @IsArray()
   @IsMongoId({ each: true })

@@ -35,7 +35,9 @@ let DocumentsService = class DocumentsService {
         if (!file) {
             throw new common_1.BadRequestException('File is required');
         }
-        const course = await this.courseModel.findById(createDocumentDto.courseId).exec();
+        const course = await this.courseModel
+            .findById(createDocumentDto.courseId)
+            .exec();
         if (!course) {
             throw new common_1.NotFoundException('Course not found');
         }
@@ -52,11 +54,12 @@ let DocumentsService = class DocumentsService {
         await this.courseModel
             .findByIdAndUpdate(course._id, { $addToSet: { documents: document._id } })
             .exec();
-        await this.messagingService.publish('document.created', {
+        const payload = JSON.stringify({
             documentId: document.id,
             courseId: course.id,
             title: document.title,
         });
+        this.messagingService.publish('events', 'document.created', Buffer.from(payload));
         return document.toObject();
     }
     async findByCourse(courseId) {
@@ -90,7 +93,9 @@ let DocumentsService = class DocumentsService {
             throw new common_1.NotFoundException('Document not found');
         }
         await this.courseModel
-            .findByIdAndUpdate(document.course, { $pull: { documents: document._id } })
+            .findByIdAndUpdate(document.course, {
+            $pull: { documents: document._id },
+        })
             .exec();
     }
 };

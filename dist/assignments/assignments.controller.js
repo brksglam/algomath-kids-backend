@@ -57,6 +57,7 @@ exports.AssignmentsController = AssignmentsController;
 __decorate([
     (0, common_1.Post)(),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher),
+    (0, swagger_1.ApiOperation)({ summary: 'Ödev oluştur' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_assignment_dto_1.CreateAssignmentDto]),
@@ -65,6 +66,7 @@ __decorate([
 __decorate([
     (0, common_1.Get)('course/:courseId'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher, roles_enum_1.Role.Student),
+    (0, swagger_1.ApiOperation)({ summary: 'Kursun ödevlerini getir (sayfalı)' }),
     __param(0, (0, common_1.Param)('courseId')),
     __param(1, (0, common_1.Query)('page')),
     __param(2, (0, common_1.Query)('limit')),
@@ -75,6 +77,7 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(':id'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher),
+    (0, swagger_1.ApiOperation)({ summary: 'Ödevi güncelle' }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -84,6 +87,7 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(':id/students'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher),
+    (0, swagger_1.ApiOperation)({ summary: 'Ödevin öğrenci listesini güncelle' }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -93,6 +97,7 @@ __decorate([
 __decorate([
     (0, common_1.Delete)(':id'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher),
+    (0, swagger_1.ApiOperation)({ summary: 'Ödevi sil' }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -103,7 +108,13 @@ __decorate([
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Student),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', { storage: multer_1.default.memoryStorage() })),
     (0, swagger_1.ApiConsumes)('multipart/form-data'),
-    (0, swagger_1.ApiBody)({ schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' } } } }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: { file: { type: 'string', format: 'binary' } },
+        },
+    }),
+    (0, swagger_1.ApiOperation)({ summary: 'Ödev teslim yükle (dosya)' }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.UploadedFile)()),
     __param(2, (0, common_1.Req)()),

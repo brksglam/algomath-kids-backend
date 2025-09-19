@@ -12,25 +12,47 @@ export class Course {
   @Prop({ trim: true })
   description?: string;
 
-  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }], default: [] })
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }],
+    default: [],
+  })
   teachers: Types.ObjectId[];
 
-  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }], default: [] })
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }],
+    default: [],
+  })
   students: Types.ObjectId[];
 
-  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Document' }], default: [] })
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Document' }],
+    default: [],
+  })
   documents: Types.ObjectId[];
 
-  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Assignment' }], default: [] })
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Assignment' }],
+    default: [],
+  })
   assignments: Types.ObjectId[];
 
-  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Quiz' }], default: [] })
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Quiz' }],
+    default: [],
+  })
   quizzes: Types.ObjectId[];
 
-  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'ChatMessage' }], default: [] })
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'ChatMessage' }],
+    default: [],
+  })
   chats: Types.ObjectId[];
 
-  @Prop({ type: String, enum: ChatPolicy, default: ChatPolicy.StudentsWithTeacher })
+  @Prop({
+    type: String,
+    enum: ChatPolicy,
+    default: ChatPolicy.StudentsWithTeacher,
+  })
   chatPolicy: ChatPolicy;
 }
 

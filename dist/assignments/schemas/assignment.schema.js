@@ -61,11 +61,17 @@ __decorate([
     __metadata("design:type", Date)
 ], Assignment.prototype, "deadline", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'User' }], default: [] }),
+    (0, mongoose_1.Prop)({
+        type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'User' }],
+        default: [],
+    }),
     __metadata("design:type", Array)
 ], Assignment.prototype, "assignedTo", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'User' }], default: [] }),
+    (0, mongoose_1.Prop)({
+        type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'User' }],
+        default: [],
+    }),
     __metadata("design:type", Array)
 ], Assignment.prototype, "recipients", void 0);
 __decorate([

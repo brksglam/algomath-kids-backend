@@ -1,15 +1,13 @@
-import { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { ConsumeMessage } from 'amqplib';
-export declare class MessagingService implements OnModuleInit, OnModuleDestroy {
-    private readonly configService;
+import { Options, MessageCallback } from 'amqplib';
+export declare class MessagingService {
     private readonly logger;
-    private connection?;
-    private channel?;
-    constructor(configService: ConfigService);
-    onModuleInit(): Promise<void>;
-    onModuleDestroy(): Promise<void>;
-    publish(routingKey: string, message: Record<string, unknown>): Promise<void>;
-    consume(queue: string, onMessage: (message: ConsumeMessage | null) => void, routingKey?: string): Promise<void>;
-    private ensureConnection;
+    private connection;
+    private channel;
+    connect(url: string): Promise<void>;
+    assertExchange(name: string, type?: string, options?: Options.AssertExchange): Promise<void>;
+    publish(exchange: string, routingKey: string, content: Buffer, options?: Options.Publish): void;
+    assertQueue(name: string, options?: Options.AssertQueue): Promise<void>;
+    bindQueue(queue: string, exchange: string, pattern: string): Promise<void>;
+    consume(queue: string, onMessage: MessageCallback, options?: Options.Consume): Promise<void>;
+    close(): Promise<void>;
 }

@@ -52,7 +52,17 @@ __decorate([
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', { storage: multer_1.default.memoryStorage() })),
     (0, swagger_1.ApiConsumes)('multipart/form-data'),
-    (0, swagger_1.ApiBody)({ schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' }, title: { type: 'string' }, description: { type: 'string' }, courseId: { type: 'string' } } } }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                file: { type: 'string', format: 'binary' },
+                title: { type: 'string' },
+                description: { type: 'string' },
+                courseId: { type: 'string' },
+            },
+        },
+    }),
     (0, swagger_1.ApiOperation)({ summary: 'Doküman yükle (S3) ve kursa bağla' }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.UploadedFile)()),

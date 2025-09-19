@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import type { Express } from 'express';
 import { Model, Types } from 'mongoose';
@@ -6,24 +10,35 @@ import { StorageService } from '../storage/storage.service';
 import { MessagingService } from '../messaging/messaging.service';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
-import { DocumentEntity, DocumentEntityDocument } from './schemas/document.schema';
+import {
+  DocumentEntity,
+  DocumentEntityDocument,
+} from './schemas/document.schema';
 import { Course, CourseDocument } from '../courses/schemas/course.schema';
 
 @Injectable()
 export class DocumentsService {
   constructor(
-    @InjectModel(DocumentEntity.name) private readonly documentModel: Model<DocumentEntityDocument>,
-    @InjectModel(Course.name) private readonly courseModel: Model<CourseDocument>,
+    @InjectModel(DocumentEntity.name)
+    private readonly documentModel: Model<DocumentEntityDocument>,
+    @InjectModel(Course.name)
+    private readonly courseModel: Model<CourseDocument>,
     private readonly storageService: StorageService,
     private readonly messagingService: MessagingService,
   ) {}
 
-  async create(createDocumentDto: CreateDocumentDto, file: Express.Multer.File, uploadedBy: string) {
+  async create(
+    createDocumentDto: CreateDocumentDto,
+    file: Express.Multer.File,
+    uploadedBy: string,
+  ) {
     if (!file) {
       throw new BadRequestException('File is required');
     }
 
-    const course = await this.courseModel.findById(createDocumentDto.courseId).exec();
+    const course = await this.courseModel
+      .findById(createDocumentDto.courseId)
+      .exec();
     if (!course) {
       throw new NotFoundException('Course not found');
     }
@@ -37,7 +52,8 @@ export class DocumentsService {
       description: createDocumentDto.description,
       url,
       uploadedBy: new Types.ObjectId(uploadedBy),
-      recipients: createDocumentDto.recipients?.map((id) => new Types.ObjectId(id)) ?? [],
+      recipients:
+        createDocumentDto.recipients?.map((id) => new Types.ObjectId(id)) ?? [],
     });
 
     await this.courseModel
@@ -45,11 +61,16 @@ export class DocumentsService {
       .exec();
 
     // Publish event
-    await this.messagingService.publish('document.created', {
+    const payload = JSON.stringify({
       documentId: document.id,
       courseId: course.id,
       title: document.title,
     });
+    this.messagingService.publish(
+      'events',
+      'document.created',
+      Buffer.from(payload),
+    );
 
     return document.toObject();
   }
@@ -91,7 +112,9 @@ export class DocumentsService {
     }
 
     await this.courseModel
-      .findByIdAndUpdate(document.course, { $pull: { documents: document._id } })
+      .findByIdAndUpdate(document.course, {
+        $pull: { documents: document._id },
+      })
       .exec();
   }
 }

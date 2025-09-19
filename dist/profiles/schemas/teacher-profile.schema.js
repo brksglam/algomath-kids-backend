@@ -20,7 +20,12 @@ let TeacherProfile = class TeacherProfile {
 };
 exports.TeacherProfile = TeacherProfile;
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'User', required: true, unique: true }),
+    (0, mongoose_1.Prop)({
+        type: mongoose_2.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+        unique: true,
+    }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], TeacherProfile.prototype, "user", void 0);
 __decorate([

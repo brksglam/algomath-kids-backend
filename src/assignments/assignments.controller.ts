@@ -1,4 +1,17 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Express, Request } from 'express';
 import multer from 'multer';
@@ -10,7 +23,13 @@ import { AssignmentsService } from './assignments.service';
 import { AssignStudentsDto } from './dto/assign-students.dto';
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
 import { UpdateAssignmentDto } from './dto/update-assignment.dto';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiTags('Assignments')
 @ApiBearerAuth()
@@ -29,21 +48,35 @@ export class AssignmentsController {
   @Get('course/:courseId')
   @Roles(Role.Admin, Role.Teacher, Role.Student)
   @ApiOperation({ summary: 'Kursun ödevlerini getir (sayfalı)' })
-  findByCourse(@Param('courseId') courseId: string, @Query('page') page = 1, @Query('limit') limit = 10) {
-    return this.assignmentsService.findByCoursePaginated(courseId, +page, +limit);
+  findByCourse(
+    @Param('courseId') courseId: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ) {
+    return this.assignmentsService.findByCoursePaginated(
+      courseId,
+      +page,
+      +limit,
+    );
   }
 
   @Patch(':id')
   @Roles(Role.Admin, Role.Teacher)
   @ApiOperation({ summary: 'Ödevi güncelle' })
-  update(@Param('id') id: string, @Body() updateAssignmentDto: UpdateAssignmentDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateAssignmentDto: UpdateAssignmentDto,
+  ) {
     return this.assignmentsService.update(id, updateAssignmentDto);
   }
 
   @Patch(':id/students')
   @Roles(Role.Admin, Role.Teacher)
   @ApiOperation({ summary: 'Ödevin öğrenci listesini güncelle' })
-  assignStudents(@Param('id') id: string, @Body() assignStudentsDto: AssignStudentsDto) {
+  assignStudents(
+    @Param('id') id: string,
+    @Body() assignStudentsDto: AssignStudentsDto,
+  ) {
     return this.assignmentsService.assignStudents(id, assignStudentsDto);
   }
 
@@ -58,7 +91,12 @@ export class AssignmentsController {
   @Roles(Role.Student)
   @UseInterceptors(FileInterceptor('file', { storage: multer.memoryStorage() }))
   @ApiConsumes('multipart/form-data')
-  @ApiBody({ schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' } } } })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: { file: { type: 'string', format: 'binary' } },
+    },
+  })
   @ApiOperation({ summary: 'Ödev teslim yükle (dosya)' })
   submit(
     @Param('id') id: string,

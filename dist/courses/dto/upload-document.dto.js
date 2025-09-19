@@ -10,20 +10,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UploadDocumentDto = void 0;
-const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 class UploadDocumentDto {
-    name;
-    description;
+    file;
 }
 exports.UploadDocumentDto = UploadDocumentDto;
 __decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
-], UploadDocumentDto.prototype, "name", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
-], UploadDocumentDto.prototype, "description", void 0);
+    (0, swagger_1.ApiProperty)({ type: 'string', format: 'binary' }),
+    __metadata("design:type", Object)
+], UploadDocumentDto.prototype, "file", void 0);
 //# sourceMappingURL=upload-document.dto.js.map

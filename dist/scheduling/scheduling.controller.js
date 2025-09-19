@@ -65,7 +65,9 @@ __decorate([
 __decorate([
     (0, common_1.Get)('availability/:teacherId'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher),
-    (0, swagger_1.ApiOperation)({ summary: 'Admin/Teacher - Öğretmen uygunluk saatlerini getir' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Admin/Teacher - Öğretmen uygunluk saatlerini getir',
+    }),
     __param(0, (0, common_1.Param)('teacherId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -92,7 +94,9 @@ __decorate([
 __decorate([
     (0, common_1.Get)('lessons/student/:studentId'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher, roles_enum_1.Role.Student),
-    (0, swagger_1.ApiOperation)({ summary: 'Admin/Teacher/Student - Öğrencinin randevularını listele' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Admin/Teacher/Student - Öğrencinin randevularını listele',
+    }),
     __param(0, (0, common_1.Param)('studentId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),

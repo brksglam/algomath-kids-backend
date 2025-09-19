@@ -1,5 +1,24 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request, Express } from 'express';
 import multer from 'multer';
@@ -71,7 +90,10 @@ export class CoursesController {
 
   @Post(':id/teachers')
   @Roles(Role.Admin)
-  addTeacher(@Param('id') id: string, @Body() manageCourseMemberDto: ManageCourseMemberDto) {
+  addTeacher(
+    @Param('id') id: string,
+    @Body() manageCourseMemberDto: ManageCourseMemberDto,
+  ) {
     return this.coursesService.addTeacher(id, manageCourseMemberDto);
   }
 
@@ -83,7 +105,10 @@ export class CoursesController {
 
   @Post(':id/students')
   @Roles(Role.Admin, Role.Teacher)
-  addStudent(@Param('id') id: string, @Body() manageCourseMemberDto: ManageCourseMemberDto) {
+  addStudent(
+    @Param('id') id: string,
+    @Body() manageCourseMemberDto: ManageCourseMemberDto,
+  ) {
     return this.coursesService.addStudent(id, manageCourseMemberDto);
   }
 
@@ -97,7 +122,10 @@ export class CoursesController {
   @Post(':id/quizzes')
   @Roles(Role.Teacher)
   @ApiOperation({ summary: 'Kursa quiz oluştur' })
-  createQuiz(@Param('id') courseId: string, @Body() dto: Omit<CreateQuizDto, 'courseId'> & Partial<CreateQuizDto>) {
+  createQuiz(
+    @Param('id') courseId: string,
+    @Body() dto: Omit<CreateQuizDto, 'courseId'> & Partial<CreateQuizDto>,
+  ) {
     const payload: CreateQuizDto = { ...dto, courseId } as CreateQuizDto;
     return this.quizzesService.create(payload);
   }
@@ -112,16 +140,22 @@ export class CoursesController {
   // Nested: Documents (S3 upload)
   @Post(':id/documents')
   @Roles(Role.Admin, Role.Teacher)
-  @ApiOperation({ summary: 'Kursa doküman yükle (S3, opsiyonel öğrenci hedefleme)' })
+  @ApiOperation({
+    summary: 'Kursa doküman yükle (S3, opsiyonel öğrenci hedefleme)',
+  })
   @UseInterceptors(FileInterceptor('file', { storage: multer.memoryStorage() }))
   createDocument(
     @Param('id') courseId: string,
-    @Body() dto: Omit<CreateDocumentDto, 'courseId'> & Partial<CreateDocumentDto>,
+    @Body()
+    dto: Omit<CreateDocumentDto, 'courseId'> & Partial<CreateDocumentDto>,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
   ) {
     const user = req.user as { userId: string };
-    const payload: CreateDocumentDto = { ...dto, courseId } as CreateDocumentDto;
+    const payload: CreateDocumentDto = {
+      ...dto,
+      courseId,
+    } as CreateDocumentDto;
     return this.documentsService.create(payload, file, user.userId);
   }
 
@@ -129,8 +163,15 @@ export class CoursesController {
   @Post(':id/assignments')
   @Roles(Role.Admin, Role.Teacher)
   @ApiOperation({ summary: 'Kursa ödev oluştur (hedef atama yapılabilir)' })
-  createAssignment(@Param('id') courseId: string, @Body() dto: Omit<CreateAssignmentDto, 'courseId'> & Partial<CreateAssignmentDto>) {
-    const payload: CreateAssignmentDto = { ...dto, courseId } as CreateAssignmentDto;
+  createAssignment(
+    @Param('id') courseId: string,
+    @Body()
+    dto: Omit<CreateAssignmentDto, 'courseId'> & Partial<CreateAssignmentDto>,
+  ) {
+    const payload: CreateAssignmentDto = {
+      ...dto,
+      courseId,
+    } as CreateAssignmentDto;
     return this.assignmentsService.create(payload);
   }
 

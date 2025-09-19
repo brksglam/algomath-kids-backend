@@ -29,7 +29,9 @@ let AssignmentsService = class AssignmentsService {
         this.storageService = storageService;
     }
     async create(createAssignmentDto) {
-        const course = await this.courseModel.findById(createAssignmentDto.courseId).exec();
+        const course = await this.courseModel
+            .findById(createAssignmentDto.courseId)
+            .exec();
         if (!course) {
             throw new common_1.NotFoundException('Course not found');
         }
@@ -37,12 +39,18 @@ let AssignmentsService = class AssignmentsService {
             course: course._id,
             title: createAssignmentDto.title,
             description: createAssignmentDto.description,
-            deadline: createAssignmentDto.deadline ? new Date(createAssignmentDto.deadline) : undefined,
-            assignedTo: createAssignmentDto.assignedTo?.map((id) => new mongoose_2.Types.ObjectId(id)) ?? [],
-            recipients: createAssignmentDto.recipients?.map((id) => new mongoose_2.Types.ObjectId(id)) ?? [],
+            deadline: createAssignmentDto.deadline
+                ? new Date(createAssignmentDto.deadline)
+                : undefined,
+            assignedTo: createAssignmentDto.assignedTo?.map((id) => new mongoose_2.Types.ObjectId(id)) ??
+                [],
+            recipients: createAssignmentDto.recipients?.map((id) => new mongoose_2.Types.ObjectId(id)) ??
+                [],
         });
         await this.courseModel
-            .findByIdAndUpdate(course._id, { $addToSet: { assignments: assignment._id } })
+            .findByIdAndUpdate(course._id, {
+            $addToSet: { assignments: assignment._id },
+        })
             .exec();
         return assignment.toObject();
     }
@@ -101,11 +109,16 @@ let AssignmentsService = class AssignmentsService {
             throw new common_1.NotFoundException('Assignment not found');
         }
         const studentObjectId = new mongoose_2.Types.ObjectId(studentId);
-        const isAssigned = assignment.assignedTo.length === 0 || assignment.assignedTo.some((assigned) => assigned.equals(studentObjectId));
+        const isAssigned = assignment.assignedTo.length === 0 ||
+            assignment.assignedTo.some((assigned) => assigned.equals(studentObjectId));
         if (!isAssigned) {
             throw new common_1.ForbiddenException('You are not assigned to this assignment');
         }
-        const uploadPath = 'courses/' + assignment.course.toString() + '/assignments/' + assignment.id + '/submissions';
+        const uploadPath = 'courses/' +
+            assignment.course.toString() +
+            '/assignments/' +
+            assignment.id +
+            '/submissions';
         const url = await this.storageService.upload(file, uploadPath);
         assignment.submissions.push({
             student: studentObjectId,
@@ -121,7 +134,9 @@ let AssignmentsService = class AssignmentsService {
             throw new common_1.NotFoundException('Assignment not found');
         }
         await this.courseModel
-            .findByIdAndUpdate(assignment.course, { $pull: { assignments: assignment._id } })
+            .findByIdAndUpdate(assignment.course, {
+            $pull: { assignments: assignment._id },
+        })
             .exec();
     }
 };

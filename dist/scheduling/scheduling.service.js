@@ -27,12 +27,18 @@ let SchedulingService = class SchedulingService {
     }
     async upsertAvailability(teacherId, weeklySlots) {
         return this.availabilityModel
-            .findOneAndUpdate({ teacher: new mongoose_2.Types.ObjectId(teacherId) }, { $set: { weeklySlots }, $setOnInsert: { teacher: new mongoose_2.Types.ObjectId(teacherId) } }, { new: true, upsert: true })
+            .findOneAndUpdate({ teacher: new mongoose_2.Types.ObjectId(teacherId) }, {
+            $set: { weeklySlots },
+            $setOnInsert: { teacher: new mongoose_2.Types.ObjectId(teacherId) },
+        }, { new: true, upsert: true })
             .lean()
             .exec();
     }
     async getAvailability(teacherId) {
-        const av = await this.availabilityModel.findOne({ teacher: teacherId }).lean().exec();
+        const av = await this.availabilityModel
+            .findOne({ teacher: teacherId })
+            .lean()
+            .exec();
         if (!av)
             throw new common_1.NotFoundException('Availability not found');
         return av;

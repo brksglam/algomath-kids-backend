@@ -18,7 +18,10 @@ export class User {
   @Prop({ required: true, enum: Role, default: Role.Student })
   role: Role;
 
-  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Course' }], default: [] })
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Course' }],
+    default: [],
+  })
   courses: Types.ObjectId[];
 }
 

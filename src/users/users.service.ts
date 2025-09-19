@@ -11,11 +11,16 @@ import { User, UserDocument } from './schemas/user.schema';
 export class UsersService {
   private readonly saltRounds = 10;
 
-  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     const role = createUserDto.role ?? Role.Student;
-    const hashedPassword = await bcrypt.hash(createUserDto.password, this.saltRounds);
+    const hashedPassword = await bcrypt.hash(
+      createUserDto.password,
+      this.saltRounds,
+    );
 
     const createdUser = new this.userModel({
       ...createUserDto,
@@ -31,7 +36,10 @@ export class UsersService {
     return this.userModel.find().select('-password').lean().exec();
   }
 
-  async findAllPaginated(page: number, limit: number): Promise<{ items: User[]; total: number }> {
+  async findAllPaginated(
+    page: number,
+    limit: number,
+  ): Promise<{ items: User[]; total: number }> {
     const [items, total] = await Promise.all([
       this.userModel
         .find()
@@ -56,11 +64,16 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const update: Record<string, unknown> = { ...updateUserDto };
     if (updateUserDto.courses) {
-      update.courses = updateUserDto.courses.map((courseId) => new Types.ObjectId(courseId));
+      update.courses = updateUserDto.courses.map(
+        (courseId) => new Types.ObjectId(courseId),
+      );
     }
 
     if (updateUserDto.password) {
-      update.password = await bcrypt.hash(updateUserDto.password, this.saltRounds);
+      update.password = await bcrypt.hash(
+        updateUserDto.password,
+        this.saltRounds,
+      );
     }
 
     const user = await this.userModel

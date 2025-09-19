@@ -5,80 +5,65 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
 var MessagingService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessagingService = void 0;
 const common_1 = require("@nestjs/common");
-const config_1 = require("@nestjs/config");
 const amqplib_1 = require("amqplib");
 let MessagingService = MessagingService_1 = class MessagingService {
-    configService;
     logger = new common_1.Logger(MessagingService_1.name);
-    connection;
-    channel;
-    constructor(configService) {
-        this.configService = configService;
-    }
-    async onModuleInit() {
-        try {
-            await this.ensureConnection();
-        }
-        catch (error) {
-            this.logger.warn('RabbitMQ connection failed during init: ' + error.message);
-        }
-    }
-    async onModuleDestroy() {
-        await this.channel?.close().catch((error) => this.logger.error('Failed to close RabbitMQ channel', error));
-        await this.connection?.close().catch((error) => this.logger.error('Failed to close RabbitMQ connection', error));
-    }
-    async publish(routingKey, message) {
-        const channel = await this.ensureConnection();
-        if (!channel) {
-            this.logger.warn('RabbitMQ channel is unavailable; skipping publish');
+    connection = null;
+    channel = null;
+    async connect(url) {
+        if (this.connection)
             return;
-        }
-        const exchange = this.configService.get('RABBITMQ_EXCHANGE', 'app-events');
-        await channel.assertExchange(exchange, 'topic', { durable: true });
-        channel.publish(exchange, routingKey, Buffer.from(JSON.stringify(message), 'utf-8'));
+        this.connection = await (0, amqplib_1.connect)(url);
+        this.channel = await this.connection.createChannel();
     }
-    async consume(queue, onMessage, routingKey = '#') {
-        const channel = await this.ensureConnection();
-        if (!channel) {
-            this.logger.warn('RabbitMQ channel is unavailable; cannot consume messages');
-            return;
-        }
-        const exchange = this.configService.get('RABBITMQ_EXCHANGE', 'app-events');
-        await channel.assertExchange(exchange, 'topic', { durable: true });
-        await channel.assertQueue(queue, { durable: true });
-        await channel.bindQueue(queue, exchange, routingKey);
-        channel.consume(queue, onMessage, { noAck: false });
+    async assertExchange(name, type = 'topic', options) {
+        if (!this.channel)
+            throw new Error('Channel not initialized');
+        await this.channel.assertExchange(name, type, options);
     }
-    async ensureConnection() {
-        if (this.channel) {
-            return this.channel;
-        }
-        const url = this.configService.get('RABBITMQ_URL');
-        if (!url) {
-            this.logger.warn('RABBITMQ_URL is not configured');
-            return undefined;
-        }
+    publish(exchange, routingKey, content, options) {
+        if (!this.channel)
+            throw new Error('Channel not initialized');
+        this.channel.publish(exchange, routingKey, content, options);
+    }
+    async assertQueue(name, options) {
+        if (!this.channel)
+            throw new Error('Channel not initialized');
+        await this.channel.assertQueue(name, options);
+    }
+    async bindQueue(queue, exchange, pattern) {
+        if (!this.channel)
+            throw new Error('Channel not initialized');
+        await this.channel.bindQueue(queue, exchange, pattern);
+    }
+    async consume(queue, onMessage, options) {
+        if (!this.channel)
+            throw new Error('Channel not initialized');
+        await this.channel.consume(queue, onMessage, options);
+    }
+    async close() {
         try {
-            this.connection = await (0, amqplib_1.connect)(url);
-            this.channel = await this.connection.createChannel();
-            return this.channel;
+            if (this.channel) {
+                await this.channel.close();
+                this.channel = null;
+            }
+            if (this.connection) {
+                await this.connection.close();
+                this.connection = null;
+            }
         }
-        catch (error) {
-            this.logger.warn('RabbitMQ connection error: ' + error.message);
-            return undefined;
+        catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            this.logger.error('Error while closing AMQP resources: ' + msg);
         }
     }
 };
 exports.MessagingService = MessagingService;
 exports.MessagingService = MessagingService = MessagingService_1 = __decorate([
-    (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [config_1.ConfigService])
+    (0, common_1.Injectable)()
 ], MessagingService);
 //# sourceMappingURL=messaging.service.js.map

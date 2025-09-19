@@ -81,11 +81,17 @@ let CoursesController = class CoursesController {
     }
     createDocument(courseId, dto, file, req) {
         const user = req.user;
-        const payload = { ...dto, courseId };
+        const payload = {
+            ...dto,
+            courseId,
+        };
         return this.documentsService.create(payload, file, user.userId);
     }
     createAssignment(courseId, dto) {
-        const payload = { ...dto, courseId };
+        const payload = {
+            ...dto,
+            courseId,
+        };
         return this.assignmentsService.create(payload);
     }
     createChatMessage(courseId, dto, req) {
@@ -200,7 +206,9 @@ __decorate([
 __decorate([
     (0, common_1.Post)(':id/documents'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher),
-    (0, swagger_1.ApiOperation)({ summary: 'Kursa doküman yükle (S3, opsiyonel öğrenci hedefleme)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Kursa doküman yükle (S3, opsiyonel öğrenci hedefleme)',
+    }),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', { storage: multer_1.default.memoryStorage() })),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),

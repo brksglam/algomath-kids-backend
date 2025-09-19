@@ -112,7 +112,11 @@ let CoursesService = class CoursesService {
     async addTeacher(courseId, manageCourseMemberDto) {
         await this.ensureUserExists(manageCourseMemberDto.userId);
         const course = await this.courseModel
-            .findByIdAndUpdate(courseId, { $addToSet: { teachers: new mongoose_2.Types.ObjectId(manageCourseMemberDto.userId) } }, { new: true })
+            .findByIdAndUpdate(courseId, {
+            $addToSet: {
+                teachers: new mongoose_2.Types.ObjectId(manageCourseMemberDto.userId),
+            },
+        }, { new: true })
             .exec();
         if (!course) {
             throw new common_1.NotFoundException('Course not found');
@@ -127,13 +131,19 @@ let CoursesService = class CoursesService {
         if (!course) {
             throw new common_1.NotFoundException('Course not found');
         }
-        await this.userModel.updateOne({ _id: userId }, { $pull: { courses: course._id } }).exec();
+        await this.userModel
+            .updateOne({ _id: userId }, { $pull: { courses: course._id } })
+            .exec();
         return course.toObject();
     }
     async addStudent(courseId, manageCourseMemberDto) {
         await this.ensureUserExists(manageCourseMemberDto.userId);
         const course = await this.courseModel
-            .findByIdAndUpdate(courseId, { $addToSet: { students: new mongoose_2.Types.ObjectId(manageCourseMemberDto.userId) } }, { new: true })
+            .findByIdAndUpdate(courseId, {
+            $addToSet: {
+                students: new mongoose_2.Types.ObjectId(manageCourseMemberDto.userId),
+            },
+        }, { new: true })
             .exec();
         if (!course) {
             throw new common_1.NotFoundException('Course not found');
@@ -148,7 +158,9 @@ let CoursesService = class CoursesService {
         if (!course) {
             throw new common_1.NotFoundException('Course not found');
         }
-        await this.userModel.updateOne({ _id: userId }, { $pull: { courses: course._id } }).exec();
+        await this.userModel
+            .updateOne({ _id: userId }, { $pull: { courses: course._id } })
+            .exec();
         return course.toObject();
     }
     mapToObjectIds(values) {
@@ -173,7 +185,9 @@ let CoursesService = class CoursesService {
         await this.addCourseReference([...course.teachers, ...course.students], course._id);
     }
     async removeCourseReference(courseId) {
-        await this.userModel.updateMany({ courses: courseId }, { $pull: { courses: courseId } }).exec();
+        await this.userModel
+            .updateMany({ courses: courseId }, { $pull: { courses: courseId } })
+            .exec();
     }
 };
 exports.CoursesService = CoursesService;

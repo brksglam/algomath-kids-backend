@@ -17,7 +17,11 @@ let ProfilesModule = class ProfilesModule {
 exports.ProfilesModule = ProfilesModule;
 exports.ProfilesModule = ProfilesModule = __decorate([
     (0, common_1.Module)({
-        imports: [mongoose_1.MongooseModule.forFeature([{ name: teacher_profile_schema_1.TeacherProfile.name, schema: teacher_profile_schema_1.TeacherProfileSchema }])],
+        imports: [
+            mongoose_1.MongooseModule.forFeature([
+                { name: teacher_profile_schema_1.TeacherProfile.name, schema: teacher_profile_schema_1.TeacherProfileSchema },
+            ]),
+        ],
         controllers: [profiles_controller_1.ProfilesController],
         providers: [profiles_service_1.ProfilesService],
         exports: [profiles_service_1.ProfilesService],

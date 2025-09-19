@@ -41,7 +41,9 @@ let AuthController = class AuthController {
 exports.AuthController = AuthController;
 __decorate([
     (0, common_1.Post)('register'),
-    (0, swagger_1.ApiOperation)({ summary: 'Kullanıcı kaydı (sadece öğrenci kendi kayıt olabilir)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Kullanıcı kaydı (sadece öğrenci kendi kayıt olabilir)',
+    }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [register_dto_1.RegisterDto]),

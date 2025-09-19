@@ -51,7 +51,10 @@ __decorate([
     __metadata("design:type", Array)
 ], CreateAssignmentDto.prototype, "assignedTo", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Visible only to these students if provided', type: [String] }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Visible only to these students if provided',
+        type: [String],
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsMongoId)({ each: true }),

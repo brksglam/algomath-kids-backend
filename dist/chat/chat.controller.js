@@ -38,7 +38,9 @@ exports.ChatController = ChatController;
 __decorate([
     (0, common_1.Post)(),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher, roles_enum_1.Role.Student),
-    (0, swagger_1.ApiOperation)({ summary: 'Kurs feed mesajı veya DM gönder (recipientId varsa DM)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Kurs feed mesajı veya DM gönder (recipientId varsa DM)',
+    }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),

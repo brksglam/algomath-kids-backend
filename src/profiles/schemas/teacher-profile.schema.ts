@@ -5,7 +5,12 @@ export type TeacherProfileDocument = HydratedDocument<TeacherProfile>;
 
 @Schema({ timestamps: true })
 export class TeacherProfile {
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true, unique: true })
+  @Prop({
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    unique: true,
+  })
   user: Types.ObjectId;
 
   @Prop({ type: [String], default: [] })
@@ -18,6 +23,5 @@ export class TeacherProfile {
   certifications: string[];
 }
 
-export const TeacherProfileSchema = SchemaFactory.createForClass(TeacherProfile);
-
-
+export const TeacherProfileSchema =
+  SchemaFactory.createForClass(TeacherProfile);

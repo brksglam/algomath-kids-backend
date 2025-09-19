@@ -1,0 +1,5 @@
+/node_modules
+/dist
+/coverage
+/depcheck-report.json
+/tsprune-report.txt

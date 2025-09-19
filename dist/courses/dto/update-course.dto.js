@@ -48,7 +48,10 @@ __decorate([
     __metadata("design:type", Array)
 ], UpdateCourseDto.prototype, "chats", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ enum: chat_policy_enum_1.ChatPolicy, description: 'Kurs içi chat politikası' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        enum: chat_policy_enum_1.ChatPolicy,
+        description: 'Kurs içi chat politikası',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsEnum)(chat_policy_enum_1.ChatPolicy),
     __metadata("design:type", String)

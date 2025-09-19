@@ -44,7 +44,8 @@ let RedisService = RedisService_1 = class RedisService {
             .connect()
             .then(() => this.logger.log('Connected to Redis instance'))
             .catch((err) => {
-            this.logger.warn('Could not connect to Redis. Features disabled. Reason: ' + err.message);
+            this.logger.warn('Could not connect to Redis. Features disabled. Reason: ' +
+                err.message);
             try {
                 this.client?.disconnect();
             }

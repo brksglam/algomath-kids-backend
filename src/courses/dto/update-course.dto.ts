@@ -25,7 +25,10 @@ export class UpdateCourseDto extends PartialType(CreateCourseDto) {
   @IsMongoId({ each: true })
   chats?: string[];
 
-  @ApiPropertyOptional({ enum: ChatPolicy, description: 'Kurs içi chat politikası' })
+  @ApiPropertyOptional({
+    enum: ChatPolicy,
+    description: 'Kurs içi chat politikası',
+  })
   @IsOptional()
   @IsEnum(ChatPolicy)
   chatPolicy?: ChatPolicy;

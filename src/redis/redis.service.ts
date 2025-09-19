@@ -10,7 +10,9 @@ export class RedisService implements OnModuleDestroy {
   constructor(private readonly configService: ConfigService) {
     const url = this.configService.get<string>('REDIS_URL');
     if (!url) {
-      this.logger.warn('REDIS_URL not provided. Redis features will be disabled.');
+      this.logger.warn(
+        'REDIS_URL not provided. Redis features will be disabled.',
+      );
       return;
     }
 
@@ -22,7 +24,7 @@ export class RedisService implements OnModuleDestroy {
       retryStrategy: () => null,
     });
 
-    this.client.on('error', (err) => {
+    this.client.on('error', (err: Error) => {
       this.logger.warn('Redis connection error: ' + err.message);
     });
 
@@ -34,7 +36,10 @@ export class RedisService implements OnModuleDestroy {
       .connect()
       .then(() => this.logger.log('Connected to Redis instance'))
       .catch((err) => {
-        this.logger.warn('Could not connect to Redis. Features disabled. Reason: ' + err.message);
+        this.logger.warn(
+          'Could not connect to Redis. Features disabled. Reason: ' +
+            err.message,
+        );
         try {
           this.client?.disconnect();
         } finally {
@@ -49,7 +54,9 @@ export class RedisService implements OnModuleDestroy {
 
   getClient(): Redis {
     if (!this.client) {
-      throw new Error('Redis client is not configured. Ensure REDIS_URL is set.');
+      throw new Error(
+        'Redis client is not configured. Ensure REDIS_URL is set.',
+      );
     }
     return this.client;
   }
@@ -62,7 +69,11 @@ export class RedisService implements OnModuleDestroy {
     return value as unknown as T | null;
   }
 
-  async set(key: string, value: string, ttlSeconds?: number): Promise<'OK' | null> {
+  async set(
+    key: string,
+    value: string,
+    ttlSeconds?: number,
+  ): Promise<'OK' | null> {
     if (!this.client) {
       return null;
     }

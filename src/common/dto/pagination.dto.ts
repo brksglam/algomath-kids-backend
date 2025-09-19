@@ -51,5 +51,3 @@ export class PageDto<T> {
   readonly data: T[];
   readonly meta: PageMetaDto;
 }
-
-

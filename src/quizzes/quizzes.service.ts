@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateQuizDto } from './dto/create-quiz.dto';
@@ -12,19 +16,26 @@ import { MessagingService } from '../messaging/messaging.service';
 export class QuizzesService {
   constructor(
     @InjectModel(Quiz.name) private readonly quizModel: Model<QuizDocument>,
-    @InjectModel(Course.name) private readonly courseModel: Model<CourseDocument>,
+    @InjectModel(Course.name)
+    private readonly courseModel: Model<CourseDocument>,
     private readonly messagingService: MessagingService,
   ) {}
 
   async create(createQuizDto: CreateQuizDto) {
-    const course = await this.courseModel.findById(createQuizDto.courseId).exec();
+    const course = await this.courseModel
+      .findById(createQuizDto.courseId)
+      .exec();
     if (!course) {
       throw new NotFoundException('Course not found');
     }
 
     createQuizDto.questions.forEach((question, index) => {
       if (!question.options.includes(question.correctAnswer)) {
-        throw new BadRequestException('Question ' + (index + 1) + ' correct answer must be one of the options');
+        throw new BadRequestException(
+          'Question ' +
+            (index + 1) +
+            ' correct answer must be one of the options',
+        );
       }
     });
 
@@ -40,11 +51,16 @@ export class QuizzesService {
       .exec();
 
     // Publish event
-    await this.messagingService.publish('quiz.created', {
+    const payload = JSON.stringify({
       quizId: quiz.id,
       courseId: course.id,
       title: quiz.title,
     });
+    this.messagingService.publish(
+      'events',
+      'quiz.created',
+      Buffer.from(payload),
+    );
 
     return quiz.toObject();
   }
@@ -78,7 +94,11 @@ export class QuizzesService {
     if (updateQuizDto.questions) {
       updateQuizDto.questions.forEach((question, index) => {
         if (!question.options.includes(question.correctAnswer)) {
-          throw new BadRequestException('Question ' + (index + 1) + ' correct answer must be one of the options');
+          throw new BadRequestException(
+            'Question ' +
+              (index + 1) +
+              ' correct answer must be one of the options',
+          );
         }
       });
     }
@@ -101,7 +121,9 @@ export class QuizzesService {
       throw new NotFoundException('Quiz not found');
     }
 
-    await this.courseModel.findByIdAndUpdate(quiz.course, { $pull: { quizzes: quiz._id } }).exec();
+    await this.courseModel
+      .findByIdAndUpdate(quiz.course, { $pull: { quizzes: quiz._id } })
+      .exec();
   }
 
   async submit(id: string, studentId: string, submitQuizDto: SubmitQuizDto) {

@@ -29,13 +29,16 @@ const mongooseImports = dbEnabled
       MongooseModule.forRootAsync({
         imports: [ConfigModule],
         inject: [ConfigService],
-        useFactory: async (configService: ConfigService) => {
+        useFactory: (configService: ConfigService) => {
           const uri = configService.get<string>('MONGO_URI');
           const options: MongooseModuleOptions = {};
           if (!uri) {
-            logger.error('MONGO_URI is not defined. MongoDB connection will be skipped.');
+            logger.error(
+              'MONGO_URI is not defined. MongoDB connection will be skipped.',
+            );
             const mongooseInstance = new mongoose.Mongoose();
-            options.connectionFactory = () => mongooseInstance.createConnection();
+            options.connectionFactory = () =>
+              mongooseInstance.createConnection();
           } else {
             options.uri = uri;
           }
@@ -46,27 +49,58 @@ const mongooseImports = dbEnabled
   : [];
 
 const dbModules = dbEnabled
-  ? [UsersModule, AuthModule, CoursesModule, DocumentsModule, AssignmentsModule, QuizzesModule, ChatModule]
+  ? [
+      UsersModule,
+      AuthModule,
+      CoursesModule,
+      DocumentsModule,
+      AssignmentsModule,
+      QuizzesModule,
+      ChatModule,
+    ]
   : [];
+
+function validateEnv(config: Record<string, unknown>) {
+  const requiredIf = (key: string, cond: boolean) => {
+    if (cond && !config[key]) throw new Error('Missing env: ' + key);
+  };
+  if (!config.PORT) config.PORT = 3000;
+  requiredIf('MONGO_URI', process.env.MONGO_DISABLED !== 'true');
+  return config;
+}
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         transport: {
-          host: configService.get<string>('MAIL_HOST') || configService.get<string>('SMTP_HOST'),
-          port: Number(configService.get<string>('MAIL_PORT') || configService.get<string>('SMTP_PORT') || 587),
-          secure: (configService.get<string>('MAIL_SECURE') || 'false') === 'true',
+          host:
+            configService.get<string>('MAIL_HOST') ||
+            configService.get<string>('SMTP_HOST'),
+          port: Number(
+            configService.get<string>('MAIL_PORT') ||
+              configService.get<string>('SMTP_PORT') ||
+              587,
+          ),
+          secure:
+            (configService.get<string>('MAIL_SECURE') || 'false') === 'true',
           auth: {
-            user: configService.get<string>('MAIL_USER') || configService.get<string>('SMTP_USER'),
-            pass: configService.get<string>('MAIL_PASS') || configService.get<string>('SMTP_PASS'),
+            user:
+              configService.get<string>('MAIL_USER') ||
+              configService.get<string>('SMTP_USER'),
+            pass:
+              configService.get<string>('MAIL_PASS') ||
+              configService.get<string>('SMTP_PASS'),
           },
         },
         defaults: {
-          from: configService.get<string>('MAIL_FROM') || configService.get<string>('CONTACT_EMAIL') || 'no-reply@example.com',
+          from:
+            configService.get<string>('MAIL_FROM') ||
+            configService.get<string>('CONTACT_EMAIL') ||
+            'no-reply@example.com',
         },
       }),
     }),

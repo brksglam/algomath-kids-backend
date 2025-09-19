@@ -1,4 +1,10 @@
-import { IsArray, IsDateString, IsMongoId, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsDateString,
+  IsMongoId,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateAssignmentDto {
@@ -26,7 +32,10 @@ export class CreateAssignmentDto {
   @IsMongoId({ each: true })
   assignedTo?: string[];
 
-  @ApiPropertyOptional({ description: 'Visible only to these students if provided', type: [String] })
+  @ApiPropertyOptional({
+    description: 'Visible only to these students if provided',
+    type: [String],
+  })
   @IsOptional()
   @IsArray()
   @IsMongoId({ each: true })

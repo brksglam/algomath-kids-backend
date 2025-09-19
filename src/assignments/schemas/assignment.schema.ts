@@ -15,7 +15,8 @@ export class AssignmentSubmission {
   submittedAt: Date;
 }
 
-const AssignmentSubmissionSchema = SchemaFactory.createForClass(AssignmentSubmission);
+const AssignmentSubmissionSchema =
+  SchemaFactory.createForClass(AssignmentSubmission);
 
 @Schema({ timestamps: true })
 export class Assignment {
@@ -31,10 +32,16 @@ export class Assignment {
   @Prop()
   deadline?: Date;
 
-  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }], default: [] })
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }],
+    default: [],
+  })
   assignedTo: Types.ObjectId[];
 
-  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }], default: [] })
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }],
+    default: [],
+  })
   recipients: Types.ObjectId[];
 
   @Prop({ type: [AssignmentSubmissionSchema], default: [] })

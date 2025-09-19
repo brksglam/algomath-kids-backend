@@ -1,4 +1,9 @@
-import { ConflictException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Role } from '../common/enums/roles.enum';
@@ -37,7 +42,9 @@ export class AuthService {
   }
 
   async adminCreateUser(adminCreateUserDto: AdminCreateUserDto) {
-    const existingUser = await this.usersService.findByEmail(adminCreateUserDto.email);
+    const existingUser = await this.usersService.findByEmail(
+      adminCreateUserDto.email,
+    );
     if (existingUser) {
       throw new ConflictException('Email already registered');
     }
@@ -49,8 +56,8 @@ export class AuthService {
   async login(loginDto: LoginDto) {
     const user = await this.validateUser(loginDto.email, loginDto.password);
     const payload: JwtPayload = {
-      sub: user.id,
-      email: user.email,
+      sub: String(user.id),
+      email: String(user.email),
       role: user.role,
     };
     const accessToken = await this.jwtService.signAsync(payload);
@@ -58,7 +65,10 @@ export class AuthService {
     return { accessToken };
   }
 
-  private async validateUser(email: string, pass: string): Promise<UserDocument> {
+  private async validateUser(
+    email: string,
+    pass: string,
+  ): Promise<UserDocument> {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -73,7 +83,10 @@ export class AuthService {
   }
 
   private sanitizeUser(user: UserDocument) {
-    const { password, ...safeUser } = user.toObject();
-    return safeUser;
+    const obj = user.toObject() as unknown as {
+      password?: unknown;
+    } & Record<string, unknown>;
+    const { password: _password, ...safe } = obj;
+    return safe;
   }
 }

@@ -1,5 +1,12 @@
 import { Type } from 'class-transformer';
-import { ArrayMinSize, IsArray, IsMongoId, IsOptional, IsString, ValidateNested } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsMongoId,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateQuizQuestionDto {

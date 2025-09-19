@@ -10,7 +10,8 @@ import { User, UserDocument } from '../users/schemas/user.schema';
 @Injectable()
 export class CoursesService {
   constructor(
-    @InjectModel(Course.name) private readonly courseModel: Model<CourseDocument>,
+    @InjectModel(Course.name)
+    private readonly courseModel: Model<CourseDocument>,
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
@@ -22,7 +23,10 @@ export class CoursesService {
     });
 
     const savedCourse = await course.save();
-    await this.addCourseReference([...savedCourse.teachers, ...savedCourse.students], savedCourse._id);
+    await this.addCourseReference(
+      [...savedCourse.teachers, ...savedCourse.students],
+      savedCourse._id,
+    );
     return savedCourse.toObject();
   }
 
@@ -30,7 +34,10 @@ export class CoursesService {
     return this.courseModel.find().lean().exec();
   }
 
-  async findAllPaginated(page: number, limit: number): Promise<{ items: unknown[]; total: number }> {
+  async findAllPaginated(
+    page: number,
+    limit: number,
+  ): Promise<{ items: unknown[]; total: number }> {
     const [items, total] = await Promise.all([
       this.courseModel
         .find()
@@ -119,13 +126,20 @@ export class CoursesService {
     await this.removeCourseReference(course._id);
   }
 
-  async addTeacher(courseId: string, manageCourseMemberDto: ManageCourseMemberDto) {
+  async addTeacher(
+    courseId: string,
+    manageCourseMemberDto: ManageCourseMemberDto,
+  ) {
     await this.ensureUserExists(manageCourseMemberDto.userId);
 
     const course = await this.courseModel
       .findByIdAndUpdate(
         courseId,
-        { $addToSet: { teachers: new Types.ObjectId(manageCourseMemberDto.userId) } },
+        {
+          $addToSet: {
+            teachers: new Types.ObjectId(manageCourseMemberDto.userId),
+          },
+        },
         { new: true },
       )
       .exec();
@@ -134,7 +148,10 @@ export class CoursesService {
       throw new NotFoundException('Course not found');
     }
 
-    await this.addCourseReference([new Types.ObjectId(manageCourseMemberDto.userId)], course._id);
+    await this.addCourseReference(
+      [new Types.ObjectId(manageCourseMemberDto.userId)],
+      course._id,
+    );
     return course.toObject();
   }
 
@@ -151,17 +168,26 @@ export class CoursesService {
       throw new NotFoundException('Course not found');
     }
 
-    await this.userModel.updateOne({ _id: userId }, { $pull: { courses: course._id } }).exec();
+    await this.userModel
+      .updateOne({ _id: userId }, { $pull: { courses: course._id } })
+      .exec();
     return course.toObject();
   }
 
-  async addStudent(courseId: string, manageCourseMemberDto: ManageCourseMemberDto) {
+  async addStudent(
+    courseId: string,
+    manageCourseMemberDto: ManageCourseMemberDto,
+  ) {
     await this.ensureUserExists(manageCourseMemberDto.userId);
 
     const course = await this.courseModel
       .findByIdAndUpdate(
         courseId,
-        { $addToSet: { students: new Types.ObjectId(manageCourseMemberDto.userId) } },
+        {
+          $addToSet: {
+            students: new Types.ObjectId(manageCourseMemberDto.userId),
+          },
+        },
         { new: true },
       )
       .exec();
@@ -170,7 +196,10 @@ export class CoursesService {
       throw new NotFoundException('Course not found');
     }
 
-    await this.addCourseReference([new Types.ObjectId(manageCourseMemberDto.userId)], course._id);
+    await this.addCourseReference(
+      [new Types.ObjectId(manageCourseMemberDto.userId)],
+      course._id,
+    );
     return course.toObject();
   }
 
@@ -187,7 +216,9 @@ export class CoursesService {
       throw new NotFoundException('Course not found');
     }
 
-    await this.userModel.updateOne({ _id: userId }, { $pull: { courses: course._id } }).exec();
+    await this.userModel
+      .updateOne({ _id: userId }, { $pull: { courses: course._id } })
+      .exec();
     return course.toObject();
   }
 
@@ -202,22 +233,33 @@ export class CoursesService {
     }
   }
 
-  private async addCourseReference(userIds: Types.ObjectId[], courseId: Types.ObjectId) {
+  private async addCourseReference(
+    userIds: Types.ObjectId[],
+    courseId: Types.ObjectId,
+  ) {
     if (userIds.length === 0) {
       return;
     }
 
     await this.userModel
-      .updateMany({ _id: { $in: userIds } }, { $addToSet: { courses: courseId } })
+      .updateMany(
+        { _id: { $in: userIds } },
+        { $addToSet: { courses: courseId } },
+      )
       .exec();
   }
 
   private async refreshCourseReferences(course: CourseDocument) {
     await this.removeCourseReference(course._id);
-    await this.addCourseReference([...course.teachers, ...course.students], course._id);
+    await this.addCourseReference(
+      [...course.teachers, ...course.students],
+      course._id,
+    );
   }
 
   private async removeCourseReference(courseId: Types.ObjectId) {
-    await this.userModel.updateMany({ courses: courseId }, { $pull: { courses: courseId } }).exec();
+    await this.userModel
+      .updateMany({ courses: courseId }, { $pull: { courses: courseId } })
+      .exec();
   }
 }

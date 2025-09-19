@@ -78,8 +78,8 @@ let AuthService = class AuthService {
     async login(loginDto) {
         const user = await this.validateUser(loginDto.email, loginDto.password);
         const payload = {
-            sub: user.id,
-            email: user.email,
+            sub: String(user.id),
+            email: String(user.email),
             role: user.role,
         };
         const accessToken = await this.jwtService.signAsync(payload);
@@ -97,8 +97,9 @@ let AuthService = class AuthService {
         return user;
     }
     sanitizeUser(user) {
-        const { password, ...safeUser } = user.toObject();
-        return safeUser;
+        const obj = user.toObject();
+        const { password: _password, ...safe } = obj;
+        return safe;
     }
 };
 exports.AuthService = AuthService;

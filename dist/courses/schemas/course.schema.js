@@ -34,31 +34,53 @@ __decorate([
     __metadata("design:type", String)
 ], Course.prototype, "description", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'User' }], default: [] }),
+    (0, mongoose_1.Prop)({
+        type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'User' }],
+        default: [],
+    }),
     __metadata("design:type", Array)
 ], Course.prototype, "teachers", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'User' }], default: [] }),
+    (0, mongoose_1.Prop)({
+        type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'User' }],
+        default: [],
+    }),
     __metadata("design:type", Array)
 ], Course.prototype, "students", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'Document' }], default: [] }),
+    (0, mongoose_1.Prop)({
+        type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'Document' }],
+        default: [],
+    }),
     __metadata("design:type", Array)
 ], Course.prototype, "documents", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'Assignment' }], default: [] }),
+    (0, mongoose_1.Prop)({
+        type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'Assignment' }],
+        default: [],
+    }),
     __metadata("design:type", Array)
 ], Course.prototype, "assignments", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'Quiz' }], default: [] }),
+    (0, mongoose_1.Prop)({
+        type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'Quiz' }],
+        default: [],
+    }),
     __metadata("design:type", Array)
 ], Course.prototype, "quizzes", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'ChatMessage' }], default: [] }),
+    (0, mongoose_1.Prop)({
+        type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'ChatMessage' }],
+        default: [],
+    }),
     __metadata("design:type", Array)
 ], Course.prototype, "chats", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: String, enum: chat_policy_enum_1.ChatPolicy, default: chat_policy_enum_1.ChatPolicy.StudentsWithTeacher }),
+    (0, mongoose_1.Prop)({
+        type: String,
+        enum: chat_policy_enum_1.ChatPolicy,
+        default: chat_policy_enum_1.ChatPolicy.StudentsWithTeacher,
+    }),
     __metadata("design:type", String)
 ], Course.prototype, "chatPolicy", void 0);
 exports.Course = Course = __decorate([

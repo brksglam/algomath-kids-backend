@@ -1,4 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import type { Express } from 'express';
 import { Model, Types } from 'mongoose';
@@ -12,13 +17,17 @@ import { Course, CourseDocument } from '../courses/schemas/course.schema';
 @Injectable()
 export class AssignmentsService {
   constructor(
-    @InjectModel(Assignment.name) private readonly assignmentModel: Model<AssignmentDocument>,
-    @InjectModel(Course.name) private readonly courseModel: Model<CourseDocument>,
+    @InjectModel(Assignment.name)
+    private readonly assignmentModel: Model<AssignmentDocument>,
+    @InjectModel(Course.name)
+    private readonly courseModel: Model<CourseDocument>,
     private readonly storageService: StorageService,
   ) {}
 
   async create(createAssignmentDto: CreateAssignmentDto) {
-    const course = await this.courseModel.findById(createAssignmentDto.courseId).exec();
+    const course = await this.courseModel
+      .findById(createAssignmentDto.courseId)
+      .exec();
     if (!course) {
       throw new NotFoundException('Course not found');
     }
@@ -27,13 +36,21 @@ export class AssignmentsService {
       course: course._id,
       title: createAssignmentDto.title,
       description: createAssignmentDto.description,
-      deadline: createAssignmentDto.deadline ? new Date(createAssignmentDto.deadline) : undefined,
-      assignedTo: createAssignmentDto.assignedTo?.map((id) => new Types.ObjectId(id)) ?? [],
-      recipients: createAssignmentDto.recipients?.map((id) => new Types.ObjectId(id)) ?? [],
+      deadline: createAssignmentDto.deadline
+        ? new Date(createAssignmentDto.deadline)
+        : undefined,
+      assignedTo:
+        createAssignmentDto.assignedTo?.map((id) => new Types.ObjectId(id)) ??
+        [],
+      recipients:
+        createAssignmentDto.recipients?.map((id) => new Types.ObjectId(id)) ??
+        [],
     });
 
     await this.courseModel
-      .findByIdAndUpdate(course._id, { $addToSet: { assignments: assignment._id } })
+      .findByIdAndUpdate(course._id, {
+        $addToSet: { assignments: assignment._id },
+      })
       .exec();
 
     return assignment.toObject();
@@ -64,7 +81,9 @@ export class AssignmentsService {
     }
 
     if (updateAssignmentDto.assignedTo) {
-      update.assignedTo = updateAssignmentDto.assignedTo.map((studentId) => new Types.ObjectId(studentId));
+      update.assignedTo = updateAssignmentDto.assignedTo.map(
+        (studentId) => new Types.ObjectId(studentId),
+      );
     }
 
     const assignment = await this.assignmentModel
@@ -85,7 +104,9 @@ export class AssignmentsService {
         id,
         {
           $set: {
-            assignedTo: assignStudentsDto.studentIds.map((studentId) => new Types.ObjectId(studentId)),
+            assignedTo: assignStudentsDto.studentIds.map(
+              (studentId) => new Types.ObjectId(studentId),
+            ),
           },
         },
         { new: true },
@@ -111,12 +132,21 @@ export class AssignmentsService {
     }
 
     const studentObjectId = new Types.ObjectId(studentId);
-    const isAssigned = assignment.assignedTo.length === 0 || assignment.assignedTo.some((assigned) => assigned.equals(studentObjectId));
+    const isAssigned =
+      assignment.assignedTo.length === 0 ||
+      assignment.assignedTo.some((assigned) =>
+        assigned.equals(studentObjectId),
+      );
     if (!isAssigned) {
       throw new ForbiddenException('You are not assigned to this assignment');
     }
 
-    const uploadPath = 'courses/' + assignment.course.toString() + '/assignments/' + assignment.id + '/submissions';
+    const uploadPath =
+      'courses/' +
+      assignment.course.toString() +
+      '/assignments/' +
+      assignment.id +
+      '/submissions';
     const url = await this.storageService.upload(file, uploadPath);
 
     assignment.submissions.push({
@@ -136,7 +166,9 @@ export class AssignmentsService {
     }
 
     await this.courseModel
-      .findByIdAndUpdate(assignment.course, { $pull: { assignments: assignment._id } })
+      .findByIdAndUpdate(assignment.course, {
+        $pull: { assignments: assignment._id },
+      })
       .exec();
   }
 }

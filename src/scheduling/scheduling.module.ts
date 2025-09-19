@@ -2,7 +2,10 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SchedulingController } from './scheduling.controller';
 import { SchedulingService } from './scheduling.service';
-import { Availability, AvailabilitySchema } from './schemas/availability.schema';
+import {
+  Availability,
+  AvailabilitySchema,
+} from './schemas/availability.schema';
 import { Lesson, LessonSchema } from './schemas/lesson.schema';
 
 @Module({
@@ -17,5 +20,3 @@ import { Lesson, LessonSchema } from './schemas/lesson.schema';
   exports: [SchedulingService],
 })
 export class SchedulingModule {}
-
-

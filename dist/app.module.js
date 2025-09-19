@@ -38,7 +38,7 @@ const mongooseImports = dbEnabled
         mongoose_1.MongooseModule.forRootAsync({
             imports: [config_1.ConfigModule],
             inject: [config_1.ConfigService],
-            useFactory: async (configService) => {
+            useFactory: (configService) => {
                 const uri = configService.get('MONGO_URI');
                 const options = {};
                 if (!uri) {
@@ -55,30 +55,55 @@ const mongooseImports = dbEnabled
     ]
     : [];
 const dbModules = dbEnabled
-    ? [users_module_1.UsersModule, auth_module_1.AuthModule, courses_module_1.CoursesModule, documents_module_1.DocumentsModule, assignments_module_1.AssignmentsModule, quizzes_module_1.QuizzesModule, chat_module_1.ChatModule]
+    ? [
+        users_module_1.UsersModule,
+        auth_module_1.AuthModule,
+        courses_module_1.CoursesModule,
+        documents_module_1.DocumentsModule,
+        assignments_module_1.AssignmentsModule,
+        quizzes_module_1.QuizzesModule,
+        chat_module_1.ChatModule,
+    ]
     : [];
+function validateEnv(config) {
+    const requiredIf = (key, cond) => {
+        if (cond && !config[key])
+            throw new Error('Missing env: ' + key);
+    };
+    if (!config.PORT)
+        config.PORT = 3000;
+    requiredIf('MONGO_URI', process.env.MONGO_DISABLED !== 'true');
+    return config;
+}
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            config_1.ConfigModule.forRoot({ isGlobal: true }),
+            config_1.ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
             mailer_1.MailerModule.forRootAsync({
                 imports: [config_1.ConfigModule],
                 inject: [config_1.ConfigService],
                 useFactory: (configService) => ({
                     transport: {
-                        host: configService.get('MAIL_HOST') || configService.get('SMTP_HOST'),
-                        port: Number(configService.get('MAIL_PORT') || configService.get('SMTP_PORT') || 587),
+                        host: configService.get('MAIL_HOST') ||
+                            configService.get('SMTP_HOST'),
+                        port: Number(configService.get('MAIL_PORT') ||
+                            configService.get('SMTP_PORT') ||
+                            587),
                         secure: (configService.get('MAIL_SECURE') || 'false') === 'true',
                         auth: {
-                            user: configService.get('MAIL_USER') || configService.get('SMTP_USER'),
-                            pass: configService.get('MAIL_PASS') || configService.get('SMTP_PASS'),
+                            user: configService.get('MAIL_USER') ||
+                                configService.get('SMTP_USER'),
+                            pass: configService.get('MAIL_PASS') ||
+                                configService.get('SMTP_PASS'),
                         },
                     },
                     defaults: {
-                        from: configService.get('MAIL_FROM') || configService.get('CONTACT_EMAIL') || 'no-reply@example.com',
+                        from: configService.get('MAIL_FROM') ||
+                            configService.get('CONTACT_EMAIL') ||
+                            'no-reply@example.com',
                     },
                 }),
             }),

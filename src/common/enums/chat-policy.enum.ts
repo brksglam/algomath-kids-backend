@@ -3,5 +3,3 @@ export enum ChatPolicy {
   StudentsWithTeacher = 'StudentsWithTeacher',
   StudentsAllInCourse = 'StudentsAllInCourse',
 }
-
-

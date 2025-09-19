@@ -6,8 +6,16 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/enums/roles.enum';
 import { SchedulingService } from './scheduling.service';
 
-class UpsertAvailabilityDto { weeklySlots: string[] }
-class CreateLessonDto { teacherId: string; studentId: string; courseId: string; startAt: string; endAt: string }
+class UpsertAvailabilityDto {
+  weeklySlots: string[];
+}
+class CreateLessonDto {
+  teacherId: string;
+  studentId: string;
+  courseId: string;
+  startAt: string;
+  endAt: string;
+}
 
 @ApiTags('Scheduling')
 @ApiBearerAuth()
@@ -19,13 +27,21 @@ export class SchedulingController {
   @Post('availability/:teacherId')
   @Roles(Role.Admin)
   @ApiOperation({ summary: 'Admin - Öğretmen uygunluk saatlerini ayarla' })
-  upsertAvailability(@Param('teacherId') teacherId: string, @Body() dto: UpsertAvailabilityDto) {
-    return this.schedulingService.upsertAvailability(teacherId, dto.weeklySlots);
+  upsertAvailability(
+    @Param('teacherId') teacherId: string,
+    @Body() dto: UpsertAvailabilityDto,
+  ) {
+    return this.schedulingService.upsertAvailability(
+      teacherId,
+      dto.weeklySlots,
+    );
   }
 
   @Get('availability/:teacherId')
   @Roles(Role.Admin, Role.Teacher)
-  @ApiOperation({ summary: 'Admin/Teacher - Öğretmen uygunluk saatlerini getir' })
+  @ApiOperation({
+    summary: 'Admin/Teacher - Öğretmen uygunluk saatlerini getir',
+  })
   getAvailability(@Param('teacherId') teacherId: string) {
     return this.schedulingService.getAvailability(teacherId);
   }
@@ -34,7 +50,13 @@ export class SchedulingController {
   @Roles(Role.Admin, Role.Teacher)
   @ApiOperation({ summary: 'Admin/Teacher - Ders randevusu oluştur' })
   createLesson(@Body() dto: CreateLessonDto) {
-    return this.schedulingService.createLesson(dto.teacherId, dto.studentId, dto.courseId, new Date(dto.startAt), new Date(dto.endAt));
+    return this.schedulingService.createLesson(
+      dto.teacherId,
+      dto.studentId,
+      dto.courseId,
+      new Date(dto.startAt),
+      new Date(dto.endAt),
+    );
   }
 
   @Get('lessons/teacher/:teacherId')
@@ -46,10 +68,10 @@ export class SchedulingController {
 
   @Get('lessons/student/:studentId')
   @Roles(Role.Admin, Role.Teacher, Role.Student)
-  @ApiOperation({ summary: 'Admin/Teacher/Student - Öğrencinin randevularını listele' })
+  @ApiOperation({
+    summary: 'Admin/Teacher/Student - Öğrencinin randevularını listele',
+  })
   listByStudent(@Param('studentId') studentId: string) {
     return this.schedulingService.listLessonsByStudent(studentId);
   }
 }
-
-

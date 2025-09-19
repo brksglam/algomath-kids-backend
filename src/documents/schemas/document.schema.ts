@@ -20,7 +20,10 @@ export class DocumentEntity {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
   uploadedBy: Types.ObjectId;
 
-  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }], default: [] })
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }],
+    default: [],
+  })
   recipients: Types.ObjectId[];
 }
 

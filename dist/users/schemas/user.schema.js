@@ -38,7 +38,10 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "role", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'Course' }], default: [] }),
+    (0, mongoose_1.Prop)({
+        type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'Course' }],
+        default: [],
+    }),
     __metadata("design:type", Array)
 ], User.prototype, "courses", void 0);
 exports.User = User = __decorate([

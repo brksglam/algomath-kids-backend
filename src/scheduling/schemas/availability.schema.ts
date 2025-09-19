@@ -5,7 +5,12 @@ export type AvailabilityDocument = HydratedDocument<Availability>;
 
 @Schema({ timestamps: true })
 export class Availability {
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true, unique: true })
+  @Prop({
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    unique: true,
+  })
   teacher: Types.ObjectId;
 
   @Prop({ type: [String], default: [] })
@@ -13,5 +18,3 @@ export class Availability {
 }
 
 export const AvailabilitySchema = SchemaFactory.createForClass(Availability);
-
-

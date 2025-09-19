@@ -14,20 +14,10 @@ export declare class AuthService {
     private readonly jwtService;
     constructor(usersService: UsersService, jwtService: JwtService);
     register(registerDto: RegisterDto): Promise<{
-        email: string;
-        name: string;
-        role: Role;
-        courses: import("mongoose").Types.ObjectId[];
-        _id: import("mongoose").Types.ObjectId;
-        __v: number;
+        [x: string]: unknown;
     }>;
     adminCreateUser(adminCreateUserDto: AdminCreateUserDto): Promise<{
-        email: string;
-        name: string;
-        role: Role;
-        courses: import("mongoose").Types.ObjectId[];
-        _id: import("mongoose").Types.ObjectId;
-        __v: number;
+        [x: string]: unknown;
     }>;
     login(loginDto: LoginDto): Promise<{
         accessToken: string;

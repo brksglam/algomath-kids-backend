@@ -42,7 +42,10 @@ __decorate([
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], DocumentEntity.prototype, "uploadedBy", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'User' }], default: [] }),
+    (0, mongoose_1.Prop)({
+        type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'User' }],
+        default: [],
+    }),
     __metadata("design:type", Array)
 ], DocumentEntity.prototype, "recipients", void 0);
 exports.DocumentEntity = DocumentEntity = __decorate([

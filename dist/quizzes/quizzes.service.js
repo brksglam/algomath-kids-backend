@@ -29,13 +29,17 @@ let QuizzesService = class QuizzesService {
         this.messagingService = messagingService;
     }
     async create(createQuizDto) {
-        const course = await this.courseModel.findById(createQuizDto.courseId).exec();
+        const course = await this.courseModel
+            .findById(createQuizDto.courseId)
+            .exec();
         if (!course) {
             throw new common_1.NotFoundException('Course not found');
         }
         createQuizDto.questions.forEach((question, index) => {
             if (!question.options.includes(question.correctAnswer)) {
-                throw new common_1.BadRequestException('Question ' + (index + 1) + ' correct answer must be one of the options');
+                throw new common_1.BadRequestException('Question ' +
+                    (index + 1) +
+                    ' correct answer must be one of the options');
             }
         });
         const quiz = await this.quizModel.create({
@@ -47,11 +51,12 @@ let QuizzesService = class QuizzesService {
         await this.courseModel
             .findByIdAndUpdate(course._id, { $addToSet: { quizzes: quiz._id } })
             .exec();
-        await this.messagingService.publish('quiz.created', {
+        const payload = JSON.stringify({
             quizId: quiz.id,
             courseId: course.id,
             title: quiz.title,
         });
+        this.messagingService.publish('events', 'quiz.created', Buffer.from(payload));
         return quiz.toObject();
     }
     async findByCourse(courseId) {
@@ -80,7 +85,9 @@ let QuizzesService = class QuizzesService {
         if (updateQuizDto.questions) {
             updateQuizDto.questions.forEach((question, index) => {
                 if (!question.options.includes(question.correctAnswer)) {
-                    throw new common_1.BadRequestException('Question ' + (index + 1) + ' correct answer must be one of the options');
+                    throw new common_1.BadRequestException('Question ' +
+                        (index + 1) +
+                        ' correct answer must be one of the options');
                 }
             });
         }
@@ -98,7 +105,9 @@ let QuizzesService = class QuizzesService {
         if (!quiz) {
             throw new common_1.NotFoundException('Quiz not found');
         }
-        await this.courseModel.findByIdAndUpdate(quiz.course, { $pull: { quizzes: quiz._id } }).exec();
+        await this.courseModel
+            .findByIdAndUpdate(quiz.course, { $pull: { quizzes: quiz._id } })
+            .exec();
     }
     async submit(id, studentId, submitQuizDto) {
         const quiz = await this.quizModel.findById(id).lean().exec();

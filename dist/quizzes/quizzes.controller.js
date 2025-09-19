@@ -52,6 +52,7 @@ exports.QuizzesController = QuizzesController;
 __decorate([
     (0, common_1.Post)(),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher),
+    (0, swagger_1.ApiOperation)({ summary: 'Quiz oluştur' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_quiz_dto_1.CreateQuizDto]),
@@ -73,6 +74,7 @@ __decorate([
 __decorate([
     (0, common_1.Get)(':id'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher, roles_enum_1.Role.Student),
+    (0, swagger_1.ApiOperation)({ summary: 'Quiz detayını getir' }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -81,6 +83,7 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(':id'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher),
+    (0, swagger_1.ApiOperation)({ summary: 'Quiz güncelle' }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -90,6 +93,7 @@ __decorate([
 __decorate([
     (0, common_1.Delete)(':id'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Admin, roles_enum_1.Role.Teacher),
+    (0, swagger_1.ApiOperation)({ summary: 'Quiz sil' }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -98,6 +102,7 @@ __decorate([
 __decorate([
     (0, common_1.Post)(':id/attempts'),
     (0, roles_decorator_1.Roles)(roles_enum_1.Role.Student),
+    (0, swagger_1.ApiOperation)({ summary: 'Öğrenci quiz attempt gönderir, skor döner' }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.Req)()),

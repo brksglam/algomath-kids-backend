@@ -1,57 +1,62 @@
-import { Logger } from '@nestjs/common';
-import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import {
+  ConnectedSocket,
+  MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 
-interface JoinPayload {
-  courseId: string;
-}
-
-interface MessagePayload {
-  courseId: string;
-  senderId: string;
-  content: string;
-}
-
-@WebSocketGateway({ namespace: 'chat', cors: true })
+@WebSocketGateway({ cors: { origin: '*' } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  private readonly logger = new Logger(ChatGateway.name);
-
-  @WebSocketServer()
-  server: Server;
+  @WebSocketServer() server!: Server;
 
   constructor(private readonly chatService: ChatService) {}
 
-  handleConnection(client: Socket) {
-    this.logger.debug('Client connected: ' + client.id);
+  handleConnection(_client: Socket) {
+    // no-op: auth could be verified here
   }
 
-  handleDisconnect(client: Socket) {
-    this.logger.debug('Client disconnected: ' + client.id);
+  handleDisconnect(_client: Socket) {
+    // no-op
   }
 
-  @SubscribeMessage('join')
-  handleJoin(client: Socket, payload: JoinPayload) {
-    if (!payload.courseId) {
-      client.emit('error', { message: 'courseId is required to join chat' });
-      return;
-    }
-    client.join(payload.courseId);
-    client.emit('joined', { courseId: payload.courseId });
+  @SubscribeMessage('joinCourse')
+  async onJoinCourse(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { courseId: string },
+  ) {
+    if (!data?.courseId) return;
+    await client.join('course:' + data.courseId);
   }
 
   @SubscribeMessage('message')
-  async handleMessage(client: Socket, payload: MessagePayload) {
-    if (!payload.courseId || !payload.senderId || !payload.content) {
-      client.emit('error', { message: 'courseId, senderId and content are required' });
-      return;
-    }
+  async onMessage(
+    @ConnectedSocket() _client: Socket,
+    @MessageBody()
+    data: {
+      courseId: string;
+      senderId: string;
+      content: string;
+      recipientId?: string;
+    },
+  ) {
+    if (!data?.courseId || !data?.senderId || !data?.content) return;
 
     try {
-      const message = await this.chatService.createMessage(payload.courseId, payload.senderId, payload.content);
-      this.server.to(payload.courseId).emit('message', message);
-    } catch (error) {
-      client.emit('error', { message: error.message });
+      const message = await this.chatService.createMessage(
+        data.courseId,
+        data.senderId,
+        data.content,
+        data.recipientId,
+      );
+      this.server.to('course:' + data.courseId).emit('message', message);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      _client.emit('message_error', { message: errorMessage });
     }
   }
 }
