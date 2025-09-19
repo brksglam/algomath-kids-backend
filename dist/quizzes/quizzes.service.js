@@ -52,9 +52,9 @@ let QuizzesService = class QuizzesService {
             .findByIdAndUpdate(course._id, { $addToSet: { quizzes: quiz._id } })
             .exec();
         const payload = JSON.stringify({
-            quizId: quiz.id,
-            courseId: course.id,
-            title: quiz.title,
+            quizId: String(quiz._id),
+            courseId: String(course._id),
+            title: String(quiz.title ?? ''),
         });
         this.messagingService.publish('events', 'quiz.created', Buffer.from(payload));
         return quiz.toObject();

@@ -14,11 +14,11 @@ export declare class AuthService {
     private readonly jwtService;
     constructor(usersService: UsersService, jwtService: JwtService);
     register(registerDto: RegisterDto): Promise<{
-        [x: string]: unknown;
-    }>;
+        password?: unknown;
+    } & Record<string, unknown>>;
     adminCreateUser(adminCreateUserDto: AdminCreateUserDto): Promise<{
-        [x: string]: unknown;
-    }>;
+        password?: unknown;
+    } & Record<string, unknown>>;
     login(loginDto: LoginDto): Promise<{
         accessToken: string;
     }>;

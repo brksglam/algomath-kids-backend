@@ -98,8 +98,8 @@ let AuthService = class AuthService {
     }
     sanitizeUser(user) {
         const obj = user.toObject();
-        const { password: _password, ...safe } = obj;
-        return safe;
+        delete obj.password;
+        return obj;
     }
 };
 exports.AuthService = AuthService;

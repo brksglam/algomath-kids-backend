@@ -163,6 +163,46 @@ let CoursesService = class CoursesService {
             .exec();
         return course.toObject();
     }
+    async bulkTeachers(courseId, dto) {
+        const course = await this.courseModel.findById(courseId).exec();
+        if (!course)
+            throw new common_1.NotFoundException('Course not found');
+        const addIds = dto.add.map((id) => new mongoose_2.Types.ObjectId(id));
+        const removeIds = dto.remove.map((id) => new mongoose_2.Types.ObjectId(id));
+        await this.courseModel
+            .updateOne({ _id: courseId }, {
+            $addToSet: { teachers: { $each: addIds } },
+            $pull: { teachers: { $in: removeIds } },
+        })
+            .exec();
+        await this.userModel
+            .updateMany({ _id: { $in: addIds } }, { $addToSet: { courses: course._id } })
+            .exec();
+        await this.userModel
+            .updateMany({ _id: { $in: removeIds } }, { $pull: { courses: course._id } })
+            .exec();
+        return (await this.courseModel.findById(courseId).lean().exec());
+    }
+    async bulkStudents(courseId, dto) {
+        const course = await this.courseModel.findById(courseId).exec();
+        if (!course)
+            throw new common_1.NotFoundException('Course not found');
+        const addIds = dto.add.map((id) => new mongoose_2.Types.ObjectId(id));
+        const removeIds = dto.remove.map((id) => new mongoose_2.Types.ObjectId(id));
+        await this.courseModel
+            .updateOne({ _id: courseId }, {
+            $addToSet: { students: { $each: addIds } },
+            $pull: { students: { $in: removeIds } },
+        })
+            .exec();
+        await this.userModel
+            .updateMany({ _id: { $in: addIds } }, { $addToSet: { courses: course._id } })
+            .exec();
+        await this.userModel
+            .updateMany({ _id: { $in: removeIds } }, { $pull: { courses: course._id } })
+            .exec();
+        return (await this.courseModel.findById(courseId).lean().exec());
+    }
     mapToObjectIds(values) {
         return values?.map((value) => new mongoose_2.Types.ObjectId(value)) ?? [];
     }

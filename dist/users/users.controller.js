@@ -25,8 +25,8 @@ let UsersController = class UsersController {
         if (!user)
             return null;
         const obj = user.toObject();
-        const { password: _password, ...safe } = obj;
-        return safe;
+        delete obj.password;
+        return obj;
     }
 };
 exports.UsersController = UsersController;

@@ -6,12 +6,12 @@ export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
     register(registerDto: RegisterDto): Promise<{
-        [x: string]: unknown;
-    }>;
+        password?: unknown;
+    } & Record<string, unknown>>;
     login(loginDto: LoginDto): Promise<{
         accessToken: string;
     }>;
     adminRegister(adminCreateUserDto: AdminCreateUserDto): Promise<{
-        [x: string]: unknown;
-    }>;
+        password?: unknown;
+    } & Record<string, unknown>>;
 }

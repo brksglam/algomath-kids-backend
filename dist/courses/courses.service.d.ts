@@ -4,6 +4,7 @@ import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course, CourseDocument } from './schemas/course.schema';
 import { UserDocument } from '../users/schemas/user.schema';
+import { ManageCourseMemberBatchDto } from './dto/manage-course-member-batch.dto';
 export declare class CoursesService {
     private readonly courseModel;
     private readonly userModel;
@@ -88,6 +89,20 @@ export declare class CoursesService {
     }> & {
         __v: number;
     }>;
+    bulkTeachers(courseId: string, dto: ManageCourseMemberBatchDto): Promise<import("mongoose").FlattenMaps<import("mongoose").Document<unknown, {}, Course, {}, {}> & Course & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }> & Required<{
+        _id: Types.ObjectId;
+    }>>;
+    bulkStudents(courseId: string, dto: ManageCourseMemberBatchDto): Promise<import("mongoose").FlattenMaps<import("mongoose").Document<unknown, {}, Course, {}, {}> & Course & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }> & Required<{
+        _id: Types.ObjectId;
+    }>>;
     private mapToObjectIds;
     private ensureUserExists;
     private addCourseReference;
