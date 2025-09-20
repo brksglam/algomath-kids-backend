@@ -25,7 +25,7 @@ export class Course {
   students: Types.ObjectId[];
 
   @Prop({
-    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Document' }],
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'DocumentEntity' }],
     default: [],
   })
   documents: Types.ObjectId[];

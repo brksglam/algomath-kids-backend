@@ -60,7 +60,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3000
-      MONGODB_URI: mongodb://admin:password123@mongodb:27017/algomath_kids?authSource=admin
+      MONGO_URI: mongodb://admin:password123@mongodb:27017/algomath_kids?authSource=admin
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: redis123

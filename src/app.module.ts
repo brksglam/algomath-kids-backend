@@ -30,11 +30,13 @@ const mongooseImports = dbEnabled
         imports: [ConfigModule],
         inject: [ConfigService],
         useFactory: (configService: ConfigService) => {
-          const uri = configService.get<string>('MONGO_URI');
+          const primaryUri = configService.get<string>('MONGO_URI');
+          const secondaryUri = configService.get<string>('MONGODB_URI');
+          const uri = primaryUri || secondaryUri;
           const options: MongooseModuleOptions = {};
           if (!uri) {
             logger.error(
-              'MONGO_URI is not defined. MongoDB connection will be skipped.',
+              'MONGO_URI/MONGODB_URI is not defined. MongoDB connection will be skipped.',
             );
             const mongooseInstance = new mongoose.Mongoose();
             options.connectionFactory = () =>
@@ -65,7 +67,11 @@ function validateEnv(config: Record<string, unknown>) {
     if (cond && !config[key]) throw new Error('Missing env: ' + key);
   };
   if (!config.PORT) config.PORT = 3000;
-  requiredIf('MONGO_URI', process.env.MONGO_DISABLED !== 'true');
+  if (process.env.MONGO_DISABLED !== 'true') {
+    if (!config['MONGO_URI'] && !config['MONGODB_URI']) {
+      throw new Error('Missing env: MONGO_URI or MONGODB_URI');
+    }
+  }
   return config;
 }
 
